@@ -1091,7 +1091,7 @@ function AIChat({ setActive, consultation, setConsultation, pendingVoiceInput, s
     if (label) setRxNotice(`Prescription updated for: ${label}`)
   }
 
-  const sendWithText = async (textToSend) => {
+  async function sendWithText(textToSend) {
     if (!textToSend.trim()) return
     const userText = textToSend.trim()
     const next = [...messages, { role: 'user', text: userText }]
