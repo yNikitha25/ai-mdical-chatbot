@@ -1712,7 +1712,7 @@ function Reports({ consultation, setConsultation, setActive, language }) {
 
   const fetchReports = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/reports', {
+      const res = await fetch(`${API_URL}/reports`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('medivision_token')}`
         }
@@ -1743,7 +1743,7 @@ function Reports({ consultation, setConsultation, setActive, language }) {
       const headers = {}
       if (token) headers['Authorization'] = `Bearer ${token}`
 
-      const res = await fetch('http://localhost:5000/api/reports/upload', {
+      const res = await fetch(`${API_URL}/reports/upload`, {
         method: 'POST',
         headers,
         body: formData
@@ -1825,7 +1825,7 @@ function Reports({ consultation, setConsultation, setActive, language }) {
       {reports.map((report) => (
         <div key={report._id} className="report-analysis-card" style={{ marginTop: '20px', display: 'flex', gap: '20px', background: 'rgba(10, 20, 35, 0.7)', padding: '20px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', flexWrap: 'wrap' }}>
           <div style={{ flex: '1 1 300px', minWidth: '250px' }}>
-             <img src={`http://localhost:5000/uploads/${report.filename}`} alt="Report" style={{ width: '100%', borderRadius: '8px', objectFit: 'contain', maxHeight: '400px', backgroundColor: 'rgba(255,255,255,0.05)' }} />
+             <img src={`${API_URL.replace('/api', '')}/uploads/${report.filename}`} alt="Report" style={{ width: '100%', borderRadius: '8px', objectFit: 'contain', maxHeight: '400px', backgroundColor: 'rgba(255,255,255,0.05)' }} />
              <div style={{ marginTop: '10px', fontSize: '0.9em', color: '#8aa3b8' }}>{report.originalName}</div>
              <div style={{ marginTop: '5px', fontSize: '0.8em', color: '#8aa3b8' }}>Date: {new Date(report.createdAt).toLocaleDateString()}</div>
           </div>
