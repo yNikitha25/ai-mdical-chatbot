@@ -43,6 +43,10 @@ app.use((err, _req, res, _next) => {
   res.status(err.status || 500).json({ message: err.message || 'Server error' })
 })
 
-app.listen(port, () => {
-  console.log(`MediVision AI API running on http://localhost:${port}`)
-})
+if (process.env.NODE_ENV !== 'production' || process.env.RENDER) {
+  app.listen(port, () => {
+    console.log(`MediVision AI API running on http://localhost:${port}`)
+  })
+}
+
+module.exports = app

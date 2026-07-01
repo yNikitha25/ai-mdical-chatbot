@@ -7,6 +7,7 @@ const ReportSchema = new mongoose.Schema(
     originalName: String,
     mimeType: String,
     path: String,
+    cloudinaryUrl: String,
     ocrText: String,
     summary: String,
     predictions: [{ disease: String, confidence: Number }],

@@ -3,22 +3,26 @@ const multer = require('multer')
 const Report = require('../models/Report')
 const { protect } = require('../middleware/auth')
 const { analyzeReportImage } = require('../services/ai.service')
+const { uploadBufferToCloudinary } = require('../config/cloudinary')
 
 const router = express.Router()
-const upload = multer({ dest: 'uploads/', limits: { fileSize: 10 * 1024 * 1024 } })
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } })
 
 router.post('/upload', protect, upload.array('reports', 6), async (req, res, next) => {
   try {
     const files = req.files || []
     const reports = await Promise.all(
       files.map(async (file) => {
-        const aiResult = await analyzeReportImage(file.path, file.mimetype, file.originalname)
+        const cloudResult = await uploadBufferToCloudinary(file.buffer)
+        const aiResult = await analyzeReportImage(file.buffer, file.mimetype, file.originalname)
+        
         return Report.create({
           user: req.user?._id,
-          filename: file.filename,
+          filename: file.originalname,
           originalName: file.originalname,
           mimeType: file.mimetype,
-          path: file.path,
+          path: cloudResult.secure_url,
+          cloudinaryUrl: cloudResult.secure_url,
           ocrText: 'Analyzed by MediVision AI',
           summary: aiResult.analysis || 'AI analysis complete.',
           predictions: [{ disease: 'Pending', confidence: 0 }],

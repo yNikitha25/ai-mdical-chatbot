@@ -195,7 +195,7 @@ function generatePrescription(text = '', symptoms = []) {
   return { disclaimer, medicines, symptoms: detected }
 }
 
-async function analyzeReportImage(filePath, mimeType, originalName = '') {
+async function analyzeReportImage(bufferOrPath, mimeType, originalName = '') {
   const nameLower = String(originalName || '').toLowerCase()
 
   // Define smart fallbacks for testing and local mode
@@ -290,9 +290,16 @@ async function analyzeReportImage(filePath, mimeType, originalName = '') {
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
 
+    let base64Data;
+    if (Buffer.isBuffer(bufferOrPath)) {
+      base64Data = bufferOrPath.toString('base64');
+    } else {
+      base64Data = fs.readFileSync(bufferOrPath).toString('base64');
+    }
+
     const fileData = {
       inlineData: {
-        data: fs.readFileSync(filePath).toString('base64'),
+        data: base64Data,
         mimeType: mimeType,
       },
     }
