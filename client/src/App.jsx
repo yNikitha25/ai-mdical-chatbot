@@ -838,154 +838,70 @@ function Topbar({ theme, setTheme, profile, setActive, setPendingVoiceInput, lan
 
 function Dashboard({ setActive, reminders, toggleReminder, setPendingVoiceInput, language, setLanguage }) {
   return (
-    <div className="cockpit-dashboard">
-      <div className="dashboard-command-bar">
+    <div style={{ padding: '30px', maxWidth: '900px', margin: '0 auto', height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
         <div>
-          <span>MediVision AI</span>
-          <h1>{t('Intelligent Healthcare Dashboard', language)}</h1>
+          <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#1e293b', margin: '0 0 8px 0' }}>{t('Medicine Reminders', language)}</h1>
+          <p style={{ color: '#64748b', margin: 0 }}>Manage and track your active medication schedule.</p>
         </div>
-        <div className="command-status">
-          <span><i /> {t('AI Assistant Active', language)}</span>
-          <button onClick={() => setActive('AI Chat')}><Mic size={16} /> {t('Ask AI', language)}</button>
-        </div>
+        <button style={{ background: '#3b82f6', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '8px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Pill size={18} />
+          Add Medication
+        </button>
       </div>
 
-      <div className="cockpit-stats">
-        <DashboardCard title={t('Health Score', language)} action="..." className="health-score-card">
-          <div className="score-ring"><strong>86</strong><span>/100</span></div>
-          <div className="status-copy"><b>{t('Good', language)}</b><small>{t('Keep it up', language)}</small></div>
-        </DashboardCard>
-        <DashboardCard title={t('Active Symptoms', language)} action="->">
-          <div className="symptom-count"><Activity size={22} /><strong>3</strong></div>
-          <button onClick={() => setActive('Analysis')}>{t('View Details', language)}</button>
-        </DashboardCard>
-        <DashboardCard title={t('Recovery Progress', language)}>
-          <strong className="big-percent">72%</strong>
-          <div className="mini-progress"><i style={{ width: '72%' }} /></div>
-          <small>{t('Almost there', language)}</small>
-        </DashboardCard>
-        <DashboardCard title={t('Next Reminder', language)} action="->">
-          {reminders && reminders.filter(r => !r.taken).length > 0 ? (
-            (() => {
-              const next = reminders.filter(r => !r.taken)[0]
-              return (
-                <div className="pill-row cursor-pointer" onClick={() => toggleReminder(next.id)}>
-                  <Pill size={18} style={{ color: '#29d3ff' }} />
-                  <span>{next.name} ({next.dosage})<small>{language === 'English' ? `Time: ${next.time} (Mark taken)` : `${language === 'Hindi' ? 'समय' : 'సమయం'}: ${next.time}`}</small></span>
+      <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+        <div style={{ padding: '20px', borderBottom: '1px solid #e2e8f0', background: '#f8fafc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#1e293b', margin: 0 }}>Today's Schedule</h2>
+          <span style={{ fontSize: '14px', color: '#64748b', fontWeight: '500' }}>
+             {reminders && reminders.filter(r => r.taken).length} / {reminders ? reminders.length : 0} completed
+          </span>
+        </div>
+        
+        <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {reminders && reminders.length > 0 ? (
+            reminders.map((r) => (
+              <div 
+                key={r.id} 
+                onClick={() => toggleReminder(r.id)}
+                style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center', 
+                  padding: '16px', 
+                  border: r.taken ? '1px solid #d1d5db' : '1px solid #e2e8f0', 
+                  borderRadius: '12px',
+                  background: r.taken ? '#f3f4f6' : 'white',
+                  cursor: 'pointer',
+                  transition: '0.2s ease'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', opacity: r.taken ? 0.6 : 1 }}>
+                  <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: r.taken ? '#e5e7eb' : '#eff6ff', color: r.taken ? '#9ca3af' : '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '18px' }}>
+                    <Pill size={24} />
+                  </div>
+                  <div>
+                    <h3 style={{ margin: '0 0 4px 0', fontSize: '16px', color: '#1e293b', fontWeight: '600', textDecoration: r.taken ? 'line-through' : 'none' }}>{r.name}</h3>
+                    <p style={{ margin: 0, color: '#64748b', fontSize: '14px' }}>Dosage: {r.dosage}</p>
+                  </div>
                 </div>
-              )
-            })()
+                <div style={{ textAlign: 'right', display: 'flex', alignItems: 'center', gap: '20px' }}>
+                  <div style={{ color: r.taken ? '#9ca3af' : '#0f766e', fontWeight: '600', fontSize: '15px' }}>{r.time}</div>
+                  <div style={{ width: '28px', height: '28px', borderRadius: '50%', border: r.taken ? 'none' : '2px solid #cbd5e1', background: r.taken ? '#10b981' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {r.taken && <Check size={18} color="white" />}
+                  </div>
+                </div>
+              </div>
+            ))
           ) : (
-            <div className="pill-row">
-              <Check size={18} style={{ color: '#10b981' }} />
-              <span>{t('All taken!', language)}<small>{t('Great job following schedule.', language)}</small></span>
+            <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>
+               <Bell size={40} style={{ opacity: 0.2, marginBottom: '16px' }} />
+               <p style={{ margin: 0, fontSize: '16px' }}>{t('No reminders active.', language)}</p>
+               <p style={{ margin: '8px 0 0 0', fontSize: '14px', opacity: 0.8 }}>Talk to the AI Consultation to generate a prescription plan.</p>
             </div>
           )}
-          <button onClick={() => setActive('Prescriptions')}>{t('View All', language)}</button>
-        </DashboardCard>
-        <DashboardCard title={t('Emergency Alert', language)} className="cockpit-alert">
-          <div className="alert-content">
-            <AlertTriangle size={22} />
-            <div><b>{t('High Fever detected', language)}</b><small>{t('Please take rest and consult a doctor if symptoms persist.', language)}</small></div>
-          </div>
-          <button onClick={() => setActive('Emergency Alerts')}>{t('Find Nearest Hospital', language)}</button>
-        </DashboardCard>
-      </div>
-
-      <div className="cockpit-main">
-        <DashboardCard title={t('AI Medical Chat', language)} action="+" className="dash-chat">
-          <div className="mini-chat-row assistant">{t('Hello! I am MediVision AI. How can I help?', language)}</div>
-          <div className="mini-chat-row user">{t('I have headache, fever and body pain.', language)}</div>
-          <div className="mini-chat-row assistant">{t('I will analyze your symptoms. What is your temperature?', language)}</div>
-          <div className="mini-chat-input"><span>{t('Type your message...', language)}</span><Mic size={15} /><button onClick={() => setActive('AI Chat')}>{t('Go', language)}</button></div>
-        </DashboardCard>
-
-        <DashboardCard title={t('3D Visualization', language)} action="scan" className="dash-visual">
-          <button className="visual-preview" onClick={() => setActive('3D Visualization')}>
-            <img src="/reference-human-body.jpeg" alt="Human lung infection visualization" />
-            <span className="lung-glow" />
-          </button>
-          <div className="visual-details">
-            <b>{t('Lung Infection', language)}</b>
-            <small>{t('Inflammation detected in the left lung', language)}</small>
-            <button onClick={() => setActive('3D Visualization')}>{t('View Details', language)}</button>
-            <div className="scan-legend compact"><span><i className="infection" /> Infection</span><span><i className="inflammation" /> Inflammation</span><span><i className="normal" /> Normal</span></div>
-          </div>
-        </DashboardCard>
-
-        <div className="clinical-column">
-          <DashboardCard title={t('AI Analysis', language)} action="->" className="dash-analysis">
-            <div 
-              className="detected-list cursor-pointer" 
-              onClick={() => {
-                setPendingVoiceInput("I have a fever, headache, body pain, and fatigue. What should I do?");
-                setActive('AI Chat');
-              }}
-              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', padding: '4px', borderRadius: '4px', background: 'rgba(255,255,255,0.02)' }}
-              title="Click to get AI advice for these symptoms"
-            >
-              <Check size={16} style={{ color: '#29d3ff' }} /> Fever, Headache, Body Pain, Fatigue
-            </div>
-            {analytics.map((item) => <ProgressCard key={item.name} item={item} />)}
-            <div className="analysis-footer"><span>{t('Severity Level', language)} <b>{t('Moderate', language)}</b></span><span>{t('Confidence', language)} <b>78%</b></span></div>
-          </DashboardCard>
-
-          <DashboardCard title={t('Prescription', language)} action="PDF" className="dash-prescription">
-            {reminders && reminders.slice(0, 3).map((r) => (
-              <div className="medicine-mini" key={r.id}><Pill size={16} /><span>{r.name} ({r.dosage})<small>{r.time}</small></span></div>
-            ))}
-            <button className="download-mini" onClick={() => setActive('Prescriptions')}>{t('Download PDF', language)} <Download size={14} /></button>
-          </DashboardCard>
         </div>
       </div>
-
-      <div className="cockpit-bottom">
-        <DashboardCard title={t('Food Recommendations', language)} action={t('View All', language)}>
-          <div className="food-strip">{foodCards.map((food) => <img key={food.title} src={food.image} alt={food.title} />)}</div>
-          <div className="avoid-strip"><span>Fried Foods</span><span>Cold Drinks</span><span>Ice Cream</span><span>Heavy Meals</span></div>
-        </DashboardCard>
-        <DashboardCard title={t('Health Analytics', language)} action="This Week">
-          <ResponsiveContainer width="100%" height={150}>
-            <LineChart data={timeline}>
-              <Line dataKey="pulse" stroke="#f472b6" strokeWidth={3} dot={false} />
-              <Line dataKey="score" stroke="#22d3ee" strokeWidth={3} dot={false} />
-            </LineChart>
-          </ResponsiveContainer>
-        </DashboardCard>
-        <DashboardCard title={t('Reports', language)} action={t('View All', language)}>
-          {['Blood Test Report', 'Chest X-Ray', 'Prescription', 'Sugar Report'].map((item) => <div className="report-mini" key={item}><FileText size={15} /> {item}<Download size={14} /></div>)}
-        </DashboardCard>
-        <DashboardCard title={t('Medicine Reminder', language)} action={t('View All', language)} className="dashboard-reminders-list">
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '110px', overflowY: 'auto', width: '100%' }}>
-            {reminders && reminders.length > 0 ? (
-              reminders.map((r) => (
-                <div 
-                  key={r.id} 
-                  className={`medicine-mini`}
-                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', padding: '4px 8px', borderRadius: '6px', background: r.taken ? 'rgba(16,185,129,0.05)' : '' }}
-                  onClick={() => toggleReminder(r.id)}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Pill size={14} style={{ color: r.taken ? '#10b981' : '#8aa3b8' }} />
-                    <span style={{ textDecoration: r.taken ? 'line-through' : 'none', color: r.taken ? '#8aa3b8' : '#e2e8f0', fontSize: '0.9em' }}>
-                      {r.name} <small style={{ color: '#8aa3b8' }}>{r.time}</small>
-                    </span>
-                  </div>
-                  {r.taken ? (
-                    <Check size={14} style={{ color: '#10b981' }} />
-                  ) : (
-                    <div style={{ width: '10px', height: '10px', borderRadius: '50%', border: '1px solid #475569' }} />
-                  )}
-                </div>
-              ))
-            ) : (
-              <div className="medicine-mini">{t('No reminders active.', language)}</div>
-            )}
-          </div>
-        </DashboardCard>
-      </div>
-
-      <DashboardVoiceDock setActive={setActive} setPendingVoiceInput={setPendingVoiceInput} language={language} setLanguage={setLanguage} />
     </div>
   )
 }
