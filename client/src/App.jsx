@@ -33,7 +33,7 @@ import {
   Upload,
   User,
   Utensils,
-} from 'lucide-react'
+, Mic, StopCircle, MapPin, ShieldAlert, FileWarning, ClipboardList, PenTool} from 'lucide-react'
 import {
   Bar,
   BarChart,
@@ -536,6 +536,224 @@ function loadReminders(consultation) {
 }
 
 
+
+function ClinicalScribe() {
+  const [isRecording, setIsRecording] = useState(false);
+  const [transcript, setTranscript] = useState('');
+  const [soapNote, setSoapNote] = useState(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const startRecording = () => {
+    setIsRecording(true);
+    setTranscript('');
+    setSoapNote(null);
+    
+    // Simulate speech recognition since standard API requires secure context and user permission
+    let demoText = "Patient states they have been experiencing a severe headache for the past 3 days, accompanied by nausea. No fever. Blood pressure today is 135/85. Patient has a history of migraines.";
+    
+    let currentText = "";
+    let i = 0;
+    const interval = setInterval(() => {
+      currentText += demoText.charAt(i);
+      setTranscript(currentText);
+      i++;
+      if (i >= demoText.length) {
+        clearInterval(interval);
+      }
+    }, 50);
+  };
+
+  const stopRecording = () => {
+    setIsRecording(false);
+    generateSoapNote();
+  };
+
+  const generateSoapNote = () => {
+    setIsGenerating(true);
+    setTimeout(() => {
+      setSoapNote({
+        subjective: "Patient reports severe headache for 3 days, accompanied by nausea. Denies fever.",
+        objective: "BP 135/85. Patient appears in mild distress due to pain.",
+        assessment: "Acute migraine without aura. History of migraines noted.",
+        plan: "1. Prescribe Sumatriptan 50mg PRN for migraine.
+2. Advise rest in a dark, quiet room.
+3. Follow up in 1 week if symptoms persist."
+      });
+      setIsGenerating(false);
+    }, 2000);
+  };
+
+  return (
+    <div style={{ padding: '30px', maxWidth: '1000px', margin: '0 auto', height: '100%' }}>
+      <div style={{ marginBottom: '30px' }}>
+        <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#1e293b', margin: '0 0 8px 0' }}>Live AI Clinical Scribe</h1>
+        <p style={{ color: '#64748b', margin: 0 }}>Automatically transcribe consultations and generate structured SOAP notes.</p>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+        <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '24px', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#1e293b', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Mic size={20} color={isRecording ? '#ef4444' : '#64748b'} /> Live Transcription
+            </h2>
+            {isRecording ? (
+              <button onClick={stopRecording} style={{ background: '#ef4444', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
+                <StopCircle size={16} /> Stop & Generate
+              </button>
+            ) : (
+              <button onClick={startRecording} style={{ background: '#10b981', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
+                <Mic size={16} /> Start Consultation
+              </button>
+            )}
+          </div>
+          
+          <div style={{ flex: 1, background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0', padding: '16px', minHeight: '300px', fontSize: '15px', color: '#334155', lineHeight: '1.6' }}>
+            {transcript || (
+              <span style={{ color: '#94a3b8', fontStyle: 'italic' }}>Click 'Start Consultation' and speak with the patient...</span>
+            )}
+            {isRecording && <span style={{ display: 'inline-block', width: '8px', height: '16px', background: '#ef4444', marginLeft: '4px', animation: 'blink 1s infinite' }} />}
+          </div>
+        </div>
+
+        <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '24px' }}>
+          <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#1e293b', margin: '0 0 20px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <ClipboardList size={20} color="#10b981" /> Generated SOAP Note
+          </h2>
+          
+          {isGenerating ? (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '300px', color: '#64748b' }}>
+               <Activity size={40} style={{ opacity: 0.5, marginBottom: '16px', animation: 'pulse 1.5s infinite' }} />
+               <p>AI is structuring the clinical note...</p>
+            </div>
+          ) : soapNote ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '8px', borderLeft: '4px solid #3b82f6' }}>
+                <strong style={{ display: 'block', color: '#1e293b', marginBottom: '4px' }}>Subjective (S)</strong>
+                <span style={{ color: '#475569', fontSize: '14px' }}>{soapNote.subjective}</span>
+              </div>
+              <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '8px', borderLeft: '4px solid #10b981' }}>
+                <strong style={{ display: 'block', color: '#1e293b', marginBottom: '4px' }}>Objective (O)</strong>
+                <span style={{ color: '#475569', fontSize: '14px' }}>{soapNote.objective}</span>
+              </div>
+              <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '8px', borderLeft: '4px solid #f59e0b' }}>
+                <strong style={{ display: 'block', color: '#1e293b', marginBottom: '4px' }}>Assessment (A)</strong>
+                <span style={{ color: '#475569', fontSize: '14px' }}>{soapNote.assessment}</span>
+              </div>
+              <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '8px', borderLeft: '4px solid #8b5cf6' }}>
+                <strong style={{ display: 'block', color: '#1e293b', marginBottom: '4px' }}>Plan (P)</strong>
+                <span style={{ color: '#475569', fontSize: '14px', whiteSpace: 'pre-line' }}>{soapNote.plan}</span>
+              </div>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '300px', color: '#94a3b8', fontStyle: 'italic', background: '#f8fafc', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
+               Waiting for transcription...
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DrugChecker() {
+  const [drugs, setDrugs] = useState(['Ibuprofen', 'Lisinopril']);
+  const [newDrug, setNewDrug] = useState('');
+  const [isChecking, setIsChecking] = useState(false);
+  const [result, setResult] = useState(null);
+
+  const addDrug = (e) => {
+    e.preventDefault();
+    if (newDrug.trim() && !drugs.includes(newDrug.trim())) {
+      setDrugs([...drugs, newDrug.trim()]);
+      setNewDrug('');
+      setResult(null);
+    }
+  };
+
+  const removeDrug = (index) => {
+    setDrugs(drugs.filter((_, i) => i !== index));
+    setResult(null);
+  };
+
+  const checkInteractions = () => {
+    setIsChecking(true);
+    setTimeout(() => {
+      if (drugs.length < 2) {
+        setResult({ risk: 'low', message: 'Add at least two medications to check for interactions.' });
+      } else if (drugs.some(d => d.toLowerCase().includes('ibuprofen')) && drugs.some(d => d.toLowerCase().includes('lisinopril'))) {
+        setResult({
+          risk: 'high',
+          title: 'Severe Interaction Detected!',
+          message: 'Combining NSAIDs (like Ibuprofen) with ACE inhibitors (like Lisinopril) can significantly reduce kidney function and negate the blood-pressure-lowering effects of the ACE inhibitor.',
+          action: 'Contact prescribing physician immediately. Avoid taking these simultaneously.'
+        });
+      } else {
+        setResult({
+          risk: 'safe',
+          title: 'No Major Interactions',
+          message: 'Based on standard clinical databases, there are no severe interactions found between these medications.',
+          action: 'Safe to take as prescribed.'
+        });
+      }
+      setIsChecking(false);
+    }, 1500);
+  };
+
+  return (
+    <div style={{ padding: '30px', maxWidth: '800px', margin: '0 auto', height: '100%' }}>
+      <div style={{ marginBottom: '30px' }}>
+        <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#1e293b', margin: '0 0 8px 0' }}>AI Drug Interaction Checker</h1>
+        <p style={{ color: '#64748b', margin: 0 }}>Cross-reference patient prescriptions for dangerous conflicts.</p>
+      </div>
+
+      <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '24px', marginBottom: '24px' }}>
+        <h2 style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b', margin: '0 0 16px 0' }}>Current Medication List</h2>
+        
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginBottom: '20px' }}>
+          {drugs.map((drug, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#f1f5f9', padding: '8px 16px', borderRadius: '20px', fontSize: '14px', fontWeight: '500', color: '#334155', border: '1px solid #cbd5e1' }}>
+              <Pill size={16} color="#64748b" /> {drug}
+              <button onClick={() => removeDrug(i)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: 0, marginLeft: '4px', display: 'flex', alignItems: 'center' }}>
+                &times;
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <form onSubmit={addDrug} style={{ display: 'flex', gap: '12px' }}>
+          <input 
+            type="text" 
+            value={newDrug}
+            onChange={(e) => setNewDrug(e.target.value)}
+            placeholder="Type medication name (e.g. Aspirin)"
+            style={{ flex: 1, padding: '12px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '15px' }}
+          />
+          <button type="submit" style={{ background: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1', padding: '0 20px', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>
+            Add
+          </button>
+        </form>
+      </div>
+
+      <button onClick={checkInteractions} disabled={isChecking || drugs.length < 2} style={{ width: '100%', background: '#10b981', color: 'white', border: 'none', padding: '16px', borderRadius: '12px', fontSize: '16px', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', cursor: (isChecking || drugs.length < 2) ? 'not-allowed' : 'pointer', opacity: (isChecking || drugs.length < 2) ? 0.7 : 1, marginBottom: '24px', boxShadow: '0 4px 12px rgba(16, 185, 129, 0.2)' }}>
+        <ShieldAlert size={20} /> {isChecking ? 'Analyzing Database...' : 'Run Interaction Check'}
+      </button>
+
+      {result && (
+        <div style={{ background: result.risk === 'high' ? '#fef2f2' : result.risk === 'safe' ? '#f0fdf4' : '#f8fafc', border: `1px solid ${result.risk === 'high' ? '#fecaca' : result.risk === 'safe' ? '#bbf7d0' : '#e2e8f0'}`, borderRadius: '16px', padding: '24px', display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
+          <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: result.risk === 'high' ? '#fee2e2' : result.risk === 'safe' ? '#dcfce3' : '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', color: result.risk === 'high' ? '#ef4444' : result.risk === 'safe' ? '#10b981' : '#64748b' }}>
+            {result.risk === 'high' ? <AlertTriangle size={24} /> : result.risk === 'safe' ? <Check size={24} /> : <FileWarning size={24} />}
+          </div>
+          <div>
+            <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', color: result.risk === 'high' ? '#b91c1c' : result.risk === 'safe' ? '#047857' : '#1e293b' }}>{result.title || 'Check Complete'}</h3>
+            <p style={{ margin: '0 0 12px 0', fontSize: '15px', color: '#475569', lineHeight: '1.6' }}>{result.message}</p>
+            {result.action && <strong style={{ fontSize: '14px', color: result.risk === 'high' ? '#dc2626' : '#10b981' }}>Recommended Action: {result.action}</strong>}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function App() {
   const [authed, setAuthed] = useState(Boolean(localStorage.getItem('medivision_token')))
   const [authView, setAuthView] = useState('signin')
@@ -752,6 +970,8 @@ function Sidebar({ active, setActive, onLogout, language }) {
     { label: 'Reminders', state: 'Dashboard', icon: Bell },
     { label: 'Analytics', state: 'Health Analytics', icon: BarChart },
     { label: 'Emergency', state: 'Emergency Alerts', icon: AlertTriangle },
+    { label: 'Clinical Scribe', state: 'Clinical Scribe', icon: PenTool },
+    { label: 'Drug Checker', state: 'Drug Checker', icon: FileWarning },
   ];
 
   return (

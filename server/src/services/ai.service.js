@@ -324,8 +324,11 @@ Please extract and infer the following details. Respond ONLY with a valid JSON o
     const responseText = result.response.text()
     
     // Extract JSON using regex matching the first { to the last }
-    const jsonMatch = responseText.match(/\{[\s\S]*\}/)
+        // Clean up potential markdown formatting from Gemini response
+    const cleanResponse = responseText.replace(/\s*```json\s*/g, '').replace(/\s*```\s*/g, '');
+    const jsonMatch = cleanResponse.match(/\{[\s\S]*\}/)
     if (!jsonMatch) {
+      console.warn("Could not parse JSON from Gemini response, raw text was: ", responseText);
       throw new Error('No valid JSON object found in Gemini response')
     }
     const parsed = JSON.parse(jsonMatch[0].trim())
