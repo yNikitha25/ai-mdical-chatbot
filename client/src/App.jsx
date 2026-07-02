@@ -1808,6 +1808,11 @@ function Reports({ consultation, setConsultation, setActive, language }) {
         headers,
         body: formData
       })
+      if (!res.ok) {
+        const errorText = await res.text();
+        alert(`Server Error: ${res.status} - ${errorText}`);
+        return;
+      }
       if (res.ok) {
         const data = await res.json()
         if (data.reports && data.reports.length > 0) {
@@ -1859,6 +1864,7 @@ function Reports({ consultation, setConsultation, setActive, language }) {
       }
     } catch (err) {
       console.error(err)
+      alert("Upload failed. Error: " + (err.message || String(err)));
     } finally {
       setIsUploading(false)
     }
