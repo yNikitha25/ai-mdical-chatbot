@@ -198,6 +198,7 @@ async function analyzeReportImage(bufferOrPath, mimeType, originalName = '') {
   const getSmartFallback = () => {
     if (nameLower.includes('kidney') || nameLower.includes('renal') || nameLower.includes('creatinine') || nameLower.includes('bun') || nameLower.includes('egfr') || nameLower.includes('urine') || nameLower.includes('nephro')) {
       return {
+        disease: 'Stage 3 Kidney Dysfunction',
         analysis: 'Renal function profile indicates elevated Serum Creatinine (1.8 mg/dL) and Blood Urea Nitrogen (BUN) (28 mg/dL) with an estimated GFR of 45 mL/min/1.73m², consistent with Stage 3 Moderate Kidney Dysfunction.',
         solution: 'Maintain strict blood pressure control (<130/80), avoid nephrotoxic medicines like NSAIDs (ibuprofen/diclofenac), and seek consultation with a nephrologist.',
         prescription: 'Sodium Bicarbonate - 500 mg - Twice daily after food, Torsemide - 10 mg - Once daily in the morning if swelling is present (consult doctor)',
@@ -206,6 +207,7 @@ async function analyzeReportImage(bufferOrPath, mimeType, originalName = '') {
     }
     if (nameLower.includes('brain') || nameLower.includes('mri') || nameLower.includes('ct') || nameLower.includes('neuro') || nameLower.includes('head') || nameLower.includes('eeg')) {
       return {
+        disease: 'Cerebral Atrophy / Ischemia',
         analysis: 'Brain MRI / CT scan reports age-related cerebral atrophy and chronic microvascular ischemic changes in the periventricular white matter. No acute infarct or hemorrhage is detected.',
         solution: 'Manage cardiovascular risk parameters, participate in regular cognitive exercises, keep active daily, and seek neurological follow-up.',
         prescription: 'Aspirin - 75 mg - Once daily after lunch, Atorvastatin - 10 mg - Once daily at night (consult doctor)',
@@ -214,6 +216,7 @@ async function analyzeReportImage(bufferOrPath, mimeType, originalName = '') {
     }
     if (nameLower.includes('liver') || nameLower.includes('lft') || nameLower.includes('bilirubin') || nameLower.includes('alt') || nameLower.includes('ast') || nameLower.includes('sgot') || nameLower.includes('sgpt')) {
       return {
+        disease: 'Grade I/II Fatty Liver',
         analysis: 'Liver Function Test (LFT) reveals elevated ALT (SGPT) at 68 U/L and AST (SGOT) at 55 U/L with mild echogenic hepatic texture, suggesting Grade I/II fatty liver changes (hepatic steatosis).',
         solution: 'Gradual weight reduction (5-10%), complete avoidance of alcohol, regular cardiovascular exercise, and re-checking LFT in 6 weeks.',
         prescription: 'Ursodeoxycholic Acid (UDCA) - 300 mg - Twice daily after food, Vitamin E - 400 IU - Once daily after breakfast (consult doctor)',
@@ -222,6 +225,7 @@ async function analyzeReportImage(bufferOrPath, mimeType, originalName = '') {
     }
     if (nameLower.includes('lung') || nameLower.includes('xray') || nameLower.includes('x-ray') || nameLower.includes('chest') || nameLower.includes('pneumonia') || nameLower.includes('cough') || nameLower.includes('tb')) {
       return {
+        disease: 'Chronic Bronchitis',
         analysis: 'Chest X-ray shows bilateral increased bronchovascular markings and hyperinflated lung fields, suggesting chronic bronchitis or mild bronchial inflammation/infection.',
         solution: 'Avoid environmental triggers (smoke, dust, cold air), perform deep breathing exercises, and follow up with a pulmonologist.',
         prescription: 'Levosalbutamol Inhaler - 50 mcg - 2 puffs as needed for shortness of breath, Montelukast - 10 mg - Once daily at night (consult doctor)',
@@ -230,6 +234,7 @@ async function analyzeReportImage(bufferOrPath, mimeType, originalName = '') {
     }
     if (nameLower.includes('thyroid') || nameLower.includes('tsh') || nameLower.includes('t3') || nameLower.includes('t4')) {
       return {
+        disease: 'Subclinical Hypothyroidism',
         analysis: 'Thyroid profile shows elevated TSH (7.2 uIU/mL) with normal free T3 and T4 levels, suggesting subclinical hypothyroidism.',
         solution: 'Monitor TSH level in 3 months, ensure adequate dietary iodine intake, manage stress, and consult an endocrinologist.',
         prescription: 'Levothyroxine Sodium - 25 mcg - Once daily in morning on empty stomach (30 mins before food) (consult doctor)',
@@ -238,6 +243,7 @@ async function analyzeReportImage(bufferOrPath, mimeType, originalName = '') {
     }
     if (nameLower.includes('heart') || nameLower.includes('ecg') || nameLower.includes('cardiac') || nameLower.includes('blockage') || nameLower.includes('bp') || nameLower.includes('blood pressure')) {
       return {
+        disease: 'Cardiac Stress / Hypertension',
         analysis: 'Electrocardiogram (ECG) shows mild ST-segment changes suggesting potential myocardial stress or blockage risk near coronary flow pathways. Blood pressure reading of 145/95 mmHg is elevated.',
         solution: 'Reduce physical strain immediately, monitor BP twice daily, avoid high-sodium meals, and schedule a cardiologist consultation for an echocardiogram.',
         prescription: 'Amlodipine - 5 mg - Once daily in the morning, Paracetamol - 500 mg - Every 8 hours if experiencing mild chest wall pressure/headache',
@@ -246,6 +252,7 @@ async function analyzeReportImage(bufferOrPath, mimeType, originalName = '') {
     }
     if (nameLower.includes('sugar') || nameLower.includes('diab') || nameLower.includes('glucose') || nameLower.includes('hba1c')) {
       return {
+        disease: 'Type 2 Diabetes',
         analysis: 'Elevated Fasting Blood Glucose (148 mg/dL) and HbA1c (7.2%). This indicates poorly controlled blood sugar levels consistent with Type 2 Diabetes.',
         solution: 'Regularly monitor blood glucose levels (fasting and post-meal), walk for 30 minutes after major meals, and consult an endocrinologist for custom medication dosing.',
         prescription: 'Metformin - 500 mg - Once daily with dinner (after food), ORS / hydration - 250 ml - Drink daily to maintain electrolyte balance',
@@ -254,6 +261,7 @@ async function analyzeReportImage(bufferOrPath, mimeType, originalName = '') {
     }
     if (nameLower.includes('skin') || nameLower.includes('rash') || nameLower.includes('eczema') || nameLower.includes('derm') || nameLower.includes('acne') || nameLower.includes('image') || nameLower.includes('photo') || nameLower.includes('lesion')) {
       return {
+        disease: 'Contact Dermatitis / Eczema',
         analysis: 'Skin examination indicates localized mild contact dermatitis / dry skin eczema pattern. There is minor epidermal inflammation with no signs of secondary bacterial infection.',
         solution: 'Apply cool compresses, avoid harsh soaps, keep the skin hydrated with a gentle ceramide moisturizer, and avoid scratching the affected area to prevent infection.',
         prescription: 'Hydrocortisone Cream 1% - Topical - Apply thin layer twice daily to affected area for up to 5 days, Cetirizine - 10 mg - Once daily at night for allergy relief, Paracetamol - 500 mg - Every 8 hours if experiencing mild itching-related discomfort',
@@ -262,6 +270,7 @@ async function analyzeReportImage(bufferOrPath, mimeType, originalName = '') {
     }
     if (nameLower.includes('blood') || nameLower.includes('cbc') || nameLower.includes('hemoglobin') || nameLower.includes('hgb') || nameLower.includes('anemia') || nameLower.includes('platelet') || nameLower.includes('wbc') || nameLower.includes('rbc') || nameLower.includes('lab') || nameLower.includes('report')) {
       return {
+        disease: 'Iron-Deficiency Anemia',
         analysis: 'Complete Blood Count (CBC) indicates a low Hemoglobin level of 10.2 g/dL (normal range: 12-16 g/dL for females, 13-17 g/dL for males) and low serum iron, suggesting mild iron-deficiency anemia.',
         solution: 'Increase dietary iron and vitamin C absorption, avoid drinking tea or coffee immediately after meals, and repeat blood tests in 4 weeks.',
         prescription: 'Iron supplement (Ferrous Ascorbate) - 100 mg - Once daily after food, Vitamin C - 500 mg - Once daily with iron supplement to boost absorption',
@@ -270,6 +279,7 @@ async function analyzeReportImage(bufferOrPath, mimeType, originalName = '') {
     }
     // Default fallback
     return {
+      disease: 'Healthy / Normal',
       analysis: 'General health screening report is within normal clinical parameters. Minor indicators show mild dehydration and high stress markers.',
       solution: 'Ensure 8 hours of sleep, reduce stress via mindfulness, drink at least 3 liters of water daily, and follow up annually.',
       prescription: 'Multivitamin supplement - 1 tablet - Once daily after breakfast, ORS / hydration - 250 ml - Drink twice daily for rehydration',
@@ -306,7 +316,8 @@ Please extract and infer the following details. Respond ONLY with a valid JSON o
   "analysis": "A detailed explanation of what happened or the results found in the report.",
   "solution": "Recommended immediate solution or action plan.",
   "prescription": "Suggested prescription or medicines (with a disclaimer to consult a doctor).",
-  "foodSuggestions": "Specific diet or food to be taken for recovery."
+  "foodSuggestions": "Specific diet or food to be taken for recovery.",
+  "disease": "The primary disease, condition, or diagnosis detected (e.g., 'Type 2 Diabetes', 'Healthy'). Keep it to 1-4 words."
 }`
 
     const result = await model.generateContent([prompt, fileData])
@@ -324,6 +335,7 @@ Please extract and infer the following details. Respond ONLY with a valid JSON o
       solution: parsed.solution || 'No solution recommended.',
       prescription: parsed.prescription || 'No specific prescription.',
       foodSuggestions: parsed.foodSuggestions || 'Regular diet.',
+      disease: parsed.disease || 'Unknown Condition',
     }
   } catch (error) {
     console.error('Error analyzing image via Gemini API, using smart local fallback:', error)

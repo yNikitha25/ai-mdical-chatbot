@@ -1669,7 +1669,11 @@ function Reports({ consultation, setConsultation, setActive, language }) {
           </div>
           <div style={{ flex: '2 1 500px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
              <div style={{ background: 'rgba(41, 211, 255, 0.05)', padding: '15px', borderRadius: '12px', border: '1px solid rgba(41, 211, 255, 0.1)' }}>
-                <h4 style={{ color: '#29d3ff', margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: '8px' }}><Activity size={18} /> What happened (Result)</h4>
+                <h4 style={{ color: '#10b981', margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: '8px' }}><Activity size={18} /> Detected Condition</h4>
+                <div style={{ fontSize: '1.2em', fontWeight: 'bold', color: '#1e293b', marginBottom: '8px' }}>
+                  {report.predictions && report.predictions.length > 0 ? report.predictions[0].disease : 'Unknown Condition'}
+                </div>
+                <h4 style={{ color: '#10b981', margin: '12px 0 8px 0', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9em' }}>Detailed Analysis</h4>
                 <p style={{ margin: 0, fontSize: '0.95em', lineHeight: '1.6', color: '#e2e8f0' }}>{report.analysis || report.summary || 'Pending AI Summary'}</p>
              </div>
              <div style={{ background: 'rgba(244, 114, 182, 0.05)', padding: '15px', borderRadius: '12px', border: '1px solid rgba(244, 114, 182, 0.1)' }}>
