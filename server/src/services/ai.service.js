@@ -290,7 +290,13 @@ async function analyzeReportImage(bufferOrPath, mimeType, originalName = '') {
   try {
     if (!process.env.GEMINI_API_KEY) {
       console.warn('GEMINI_API_KEY not configured. Using smart local fallback.')
-      return getSmartFallback()
+      return {
+        disease: 'API Key Missing',
+        analysis: 'Error: GEMINI_API_KEY is not configured on your server (Vercel/Render environment variables). The AI cannot process the report.',
+        solution: 'Please add your Gemini API key to your hosting provider settings.',
+        prescription: 'N/A',
+        foodSuggestions: 'N/A'
+      }
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
