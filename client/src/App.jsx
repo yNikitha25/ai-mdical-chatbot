@@ -757,7 +757,7 @@ function Sidebar({ active, setActive, onLogout, language }) {
   return (
     <aside className="sidebar">
       <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '0 0 10px 0', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: '10px' }}>
-        <div style={{ background: '#3b82f6', width: '36px', height: '36px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ background: '#10b981', width: '36px', height: '36px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <Activity size={20} color="white" />
         </div>
         <div>
@@ -775,7 +775,7 @@ function Sidebar({ active, setActive, onLogout, language }) {
       </nav>
       
       <div style={{ marginTop: 'auto', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '20px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#3b82f6', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>JD</div>
+        <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#10b981', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>JD</div>
         <div style={{ flex: 1 }}>
            <div style={{ color: 'white', fontWeight: '600', fontSize: '14px' }}>John Doe</div>
            <div style={{ color: '#94a3b8', fontSize: '11px' }}>Patient · ID #MD-4829</div>
@@ -844,7 +844,7 @@ function Dashboard({ setActive, reminders, toggleReminder, setPendingVoiceInput,
           <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#1e293b', margin: '0 0 8px 0' }}>{t('Medicine Reminders', language)}</h1>
           <p style={{ color: '#64748b', margin: 0 }}>Manage and track your active medication schedule.</p>
         </div>
-        <button style={{ background: '#3b82f6', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '8px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <button style={{ background: '#10b981', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '8px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Pill size={18} />
           Add Medication
         </button>
@@ -877,7 +877,7 @@ function Dashboard({ setActive, reminders, toggleReminder, setPendingVoiceInput,
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px', opacity: r.taken ? 0.6 : 1 }}>
-                  <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: r.taken ? '#e5e7eb' : '#eff6ff', color: r.taken ? '#9ca3af' : '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '18px' }}>
+                  <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: r.taken ? '#e5e7eb' : '#ecfdf5', color: r.taken ? '#9ca3af' : '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '18px' }}>
                     <Pill size={24} />
                   </div>
                   <div>
@@ -1075,7 +1075,7 @@ function AIChat({ setActive, consultation, setConsultation, pendingVoiceInput, s
 
         {/* Top Tabs */}
         <div style={{ display: 'flex', gap: '10px' }}>
-           <button style={{ background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe', padding: '10px 20px', borderRadius: '20px', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px' }}><Check size={16}/> Symptom Analysis</button>
+           <button style={{ background: '#ecfdf5', color: '#059669', border: '1px solid #a7f3d0', padding: '10px 20px', borderRadius: '20px', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px' }}><Check size={16}/> Symptom Analysis</button>
            <button style={{ background: 'white', color: '#64748b', border: '1px solid #e2e8f0', padding: '10px 20px', borderRadius: '20px', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px' }}><div style={{width:'12px', height:'12px', borderRadius:'50%', border:'2px solid #cbd5e1'}}/> Drug Interactions</button>
            <button style={{ background: 'white', color: '#64748b', border: '1px solid #e2e8f0', padding: '10px 20px', borderRadius: '20px', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px' }}><Home size={16}/> Dose Calculator</button>
         </div>
@@ -1088,7 +1088,7 @@ function AIChat({ setActive, consultation, setConsultation, pendingVoiceInput, s
                 {m.role !== 'user' && (
                   <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#0f172a', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', flexShrink: 0 }}>M</div>
                 )}
-                <div style={{ background: m.role === 'user' ? '#3b82f6' : '#f8fafc', color: m.role === 'user' ? 'white' : '#1e293b', border: m.role !== 'user' ? '1px solid #e2e8f0' : 'none', padding: '16px', borderRadius: '16px', borderTopLeftRadius: m.role !== 'user' ? 0 : '16px', borderTopRightRadius: m.role === 'user' ? 0 : '16px', fontSize: '15px', lineHeight: '1.5' }}>
+                <div style={{ background: m.role === 'user' ? '#10b981' : '#f8fafc', color: m.role === 'user' ? 'white' : '#1e293b', border: m.role !== 'user' ? '1px solid #e2e8f0' : 'none', padding: '16px', borderRadius: '16px', borderTopLeftRadius: m.role !== 'user' ? 0 : '16px', borderTopRightRadius: m.role === 'user' ? 0 : '16px', fontSize: '15px', lineHeight: '1.5' }}>
                   {m.text}
                 </div>
               </div>
@@ -1112,7 +1112,7 @@ function AIChat({ setActive, consultation, setConsultation, pendingVoiceInput, s
               <div style={{ display: 'flex', gap: '8px', paddingRight: '8px' }}>
                  <button style={{ background: 'transparent', color: '#64748b', border: 'none', padding: '8px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px' }}><Upload size={16}/> Attach lab report</button>
                  <button style={{ background: 'transparent', color: '#64748b', border: 'none', padding: '8px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px' }}><Mic size={16}/> Voice</button>
-                 <button onClick={send} style={{ background: '#3b82f6', color: 'white', border: 'none', width: '36px', height: '36px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronRight size={20}/></button>
+                 <button onClick={send} style={{ background: '#10b981', color: 'white', border: 'none', width: '36px', height: '36px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronRight size={20}/></button>
               </div>
             </div>
           </div>
@@ -1122,7 +1122,7 @@ function AIChat({ setActive, consultation, setConsultation, pendingVoiceInput, s
       {/* Right Column: Patient Profile Context */}
       <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div style={{ display: 'flex', borderBottom: '1px solid #e2e8f0' }}>
-           <button style={{ flex: 1, padding: '16px', background: 'white', border: 'none', borderBottom: '2px solid #3b82f6', color: '#3b82f6', fontWeight: '600' }}>Profile</button>
+           <button style={{ flex: 1, padding: '16px', background: 'white', border: 'none', borderBottom: '2px solid #10b981', color: '#10b981', fontWeight: '600' }}>Profile</button>
            <button style={{ flex: 1, padding: '16px', background: '#f8fafc', border: 'none', color: '#64748b', fontWeight: '500' }}>Meds</button>
            <button style={{ flex: 1, padding: '16px', background: '#f8fafc', border: 'none', color: '#64748b', fontWeight: '500' }}>Schedule</button>
         </div>
@@ -1307,7 +1307,7 @@ function ClinicalScanImage({ organ, onOrganSelect }) {
           </radialGradient>
           <linearGradient id="bodyLine" x1="0" x2="1">
             <stop offset="0%" stopColor="#1dd8ff" />
-            <stop offset="100%" stopColor="#3b82f6" />
+            <stop offset="100%" stopColor="#10b981" />
           </linearGradient>
         </defs>
 

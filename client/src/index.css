@@ -9,7 +9,7 @@
   -webkit-font-smoothing: antialiased;
   --panel: #ffffff;
   --border: #e2e8f0;
-  --cyan: #3b82f6;
+  --cyan: #10b981;
   --violet: #8b5cf6;
   --rose: #fb7185;
 }
@@ -98,7 +98,7 @@ button { cursor: pointer; }
   font-weight: 500;
 }
 .sidebar button:hover { background: rgba(255,255,255,0.05); color: white; }
-.sidebar button.active { background: #1d4ed8; color: white; box-shadow: none; border-left: none; }
+.sidebar button.active { background: #047857; color: white; box-shadow: none; border-left: none; }
 .logout { margin-top: auto; color: #fca5a5; }
 .workspace { padding: 20px; min-width: 0; }
 .topbar {
@@ -714,7 +714,7 @@ button { cursor: pointer; }
   border-radius: 999px;
   padding: 10px 13px;
   color: white;
-  background: linear-gradient(135deg, #0ea5e9, #2563eb);
+  background: linear-gradient(135deg, #0ea5e9, #059669);
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -829,7 +829,7 @@ button { cursor: pointer; }
 .mini-chat-row.user {
   width: 82%;
   justify-self: end;
-  background: linear-gradient(135deg, #0ea5e9, #2563eb);
+  background: linear-gradient(135deg, #0ea5e9, #059669);
 }
 .mini-chat-input {
   margin-top: 4px;
@@ -1113,7 +1113,7 @@ button { cursor: pointer; }
 .download-mini {
   width: 100%;
   justify-content: center;
-  background: linear-gradient(135deg, #0ea5e9, #2563eb) !important;
+  background: linear-gradient(135deg, #0ea5e9, #059669) !important;
 }
 .food-strip {
   display: grid;
