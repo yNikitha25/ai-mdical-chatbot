@@ -538,7 +538,7 @@ function loadReminders(consultation) {
 function App() {
   const [authed, setAuthed] = useState(Boolean(localStorage.getItem('medivision_token')))
   const [authView, setAuthView] = useState('signin')
-  const [active, setActive] = useState('Dashboard')
+  const [active, setActive] = useState('AI Chat')
   const [theme, setTheme] = useState('dark')
   const [language, setLanguage] = useState(() => localStorage.getItem('medivision_language') || 'English')
   const [consultation, setConsultation] = useState(loadConsultation)
@@ -742,17 +742,41 @@ function Input({ icon: Icon, onChange, ...props }) {
 }
 
 function Sidebar({ active, setActive, onLogout, language }) {
+  const customNav = [
+    { label: 'AI Consultation', state: 'AI Chat', icon: Brain },
+    { label: 'Symptom Checker', state: 'Analysis', icon: Activity },
+    { label: 'Lab Results', state: 'Reports', icon: FileText },
+    { label: 'Medications', state: 'Prescriptions', icon: Pill },
+    { label: 'Appointments', state: 'Dashboard', icon: CalendarClock },
+  ];
+
   return (
     <aside className="sidebar">
-      <div className="logo"><span><Stethoscope size={24} /></span><strong>MediVision AI</strong></div>
+      <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '0 0 10px 0', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: '10px' }}>
+        <div style={{ background: '#3b82f6', width: '36px', height: '36px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Activity size={20} color="white" />
+        </div>
+        <div>
+          <h2 style={{ margin: 0, fontSize: '18px', color: 'white', fontWeight: '600' }}>MedAssist AI</h2>
+          <p style={{ margin: 0, fontSize: '10px', color: '#94a3b8', letterSpacing: '0.5px' }}>CLINICAL DECISION SUPPORT</p>
+        </div>
+      </div>
+      <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 'bold', letterSpacing: '1px', marginTop: '10px' }}>NAVIGATION</div>
       <nav>
-        {navItems.map(([label, Icon]) => (
-          <button key={label} className={active === label ? 'active' : ''} onClick={() => setActive(label)}>
-            <Icon size={18} /> {t(label, language)}
+        {customNav.map((item) => (
+          <button key={item.label} className={active === item.state ? 'active' : ''} onClick={() => setActive(item.state)}>
+             <item.icon size={18} /> {item.label}
           </button>
         ))}
       </nav>
-      <button className="logout" onClick={onLogout}><LogOut size={18} /> {t('Secure Logout', language)}</button>
+      
+      <div style={{ marginTop: 'auto', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '20px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#3b82f6', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>JD</div>
+        <div style={{ flex: 1 }}>
+           <div style={{ color: 'white', fontWeight: '600', fontSize: '14px' }}>John Doe</div>
+           <div style={{ color: '#94a3b8', fontSize: '11px' }}>Patient · ID #MD-4829</div>
+        </div>
+      </div>
     </aside>
   )
 }
@@ -1062,13 +1086,8 @@ function AIChat({ setActive, consultation, setConsultation, pendingVoiceInput, s
   const [messages, setMessages] = useState(initialMessages)
   const [input, setInput] = useState('')
   const [typing, setTyping] = useState(false)
-  const [rxNotice, setRxNotice] = useState('')
   const [listening, setListening] = useState(false)
-  const [speechEnabled, setSpeechEnabled] = useState(true)
   const recognitionRef = useRef(null)
-
-  const severe = /chest pain|breath|stroke|oxygen|unconscious/i.test(input)
-  const detectedSymptoms = consultation.symptoms?.length ? consultation.symptoms : []
 
   useEffect(() => {
     if (pendingVoiceInput) {
@@ -1087,8 +1106,6 @@ function AIChat({ setActive, consultation, setConsultation, pendingVoiceInput, s
       lastMessage: latestMessage || conversationText,
       analysis,
     })
-    const label = (analysis.symptoms?.length ? analysis.symptoms : latestSymptoms).join(', ')
-    if (label) setRxNotice(`Prescription updated for: ${label}`)
   }
 
   async function sendWithText(textToSend) {
@@ -1098,240 +1115,141 @@ function AIChat({ setActive, consultation, setConsultation, pendingVoiceInput, s
     setMessages(next)
     setInput('')
     setTyping(true)
-    setRxNotice('')
     const conversationText = next.filter((item) => item.role === 'user').map((item) => item.text).join(' ')
     try {
       const data = await api('/ai/chat', { method: 'POST', body: JSON.stringify({ message: userText, history: next, language }) })
       setMessages([...next, { role: 'assistant', text: data.reply }])
       updateConsultation(conversationText, data, userText)
-      if (speechEnabled) {
-        speakText(data.reply, language)
-      }
     } catch {
-      const reply = translateDemoReply(demoReply(userText, language, messages), language)
+      const reply = "I am currently running in offline mode. Please consult a doctor."
       setMessages([...next, { role: 'assistant', text: reply }])
       updateConsultation(conversationText, {}, userText)
-      if (speechEnabled) {
-        speakText(reply, language)
-      }
     } finally {
       setTyping(false)
-      const isSevere = /chest pain|breath|stroke|oxygen|unconscious/i.test(userText)
-      if (isSevere) setActive('Emergency Alerts')
     }
   }
 
-  const send = () => {
-    sendWithText(input)
-  }
-
-  const toggleListen = () => {
-    if (listening) {
-      if (recognitionRef.current) recognitionRef.current.stop()
-      setListening(false)
-    } else {
-      setListening(true)
-      const rec = startSpeechRecognition(
-        (text) => {
-          sendWithText(text)
-        },
-        () => setListening(false),
-        language
-      )
-      recognitionRef.current = rec
-    }
-  }
+  const send = () => sendWithText(input)
 
   return (
-    <div className="chat-layout">
-      <GlassPanel title={t('AI Medical Chatbot', language)} action={language}>
-        <div className="chat-toolbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-            <label className="language-select">
-              <Languages size={17} />
-              <select value={language} onChange={(event) => setLanguage(event.target.value)}>
-                {languages.map((item) => <option key={item}>{item}</option>)}
-              </select>
-            </label>
-            <button 
-              type="button"
-              onClick={() => setSpeechEnabled(!speechEnabled)}
-              title={speechEnabled ? "Mute AI Voice Responses" : "Unmute AI Voice Responses"}
-              style={{ background: 'transparent', border: 'none', color: speechEnabled ? '#29d3ff' : '#8aa3b8', display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', fontSize: '0.9em' }}
-            >
-              {speechEnabled ? (
-                <>
-                  <Activity size={16} className="text-cyan-400" />
-                  <span>{t('Voice: On', language)}</span>
-                </>
-              ) : (
-                <>
-                  <Lock size={16} />
-                  <span>{t('Voice: Off', language)}</span>
-                </>
-              )}
-            </button>
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: '20px', height: '100%', alignItems: 'stretch' }}>
+      
+      {/* Center Column: Chat & Consultation */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        
+        {/* Header */}
+        <div style={{ background: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <h1 style={{ margin: '0 0 5px 0', fontSize: '24px', fontWeight: 'bold', color: '#1e293b' }}>AI Medical Consultation</h1>
+            <p style={{ margin: 0, color: '#64748b', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              Powered by Claude · Clinically informed responses 
+              <span style={{ background: '#dcfce7', color: '#166534', padding: '2px 8px', borderRadius: '12px', fontSize: '12px', fontWeight: '500' }}>● AI Online</span>
+              <span style={{ background: '#e0f2fe', color: '#0369a1', padding: '2px 8px', borderRadius: '12px', fontSize: '12px', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '4px' }}><ShieldCheck size={14}/> HIPAA Safe</span>
+            </p>
           </div>
-          <span>{t('Professional triage support, not a final diagnosis', language)}</span>
-        </div>
-
-        {/* Choose a workflow section */}
-        <div style={{ padding: '15px', background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-          <h4 style={{ color: '#29d3ff', fontSize: '0.95em', margin: '0 0 10px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <SparkleIcon size={16} /> {t('Choose a workflow', language)}
-          </h4>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '10px' }}>
-            <div 
-              style={{ background: 'rgba(10,20,35,0.6)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', padding: '12px', cursor: 'pointer', transition: 'border-color 0.3s' }}
-              onClick={() => {
-                const text = "Skin Image Triage: Please upload a photo of the skin condition in the 'Reports' tab for analysis. I will automatically extract general, non-diagnostic guidance."
-                setMessages(prev => [...prev, { role: 'assistant', text }])
-                if (speechEnabled) speakText(text, language)
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                <strong style={{ fontSize: '0.85em', color: '#29d3ff', textTransform: 'uppercase' }}>{t('Skin image triage', language)}</strong>
-                <Camera size={15} style={{ color: '#29d3ff' }} />
-              </div>
-              <p style={{ fontSize: '0.8em', color: '#a3b8cc', margin: '0 0 6px 0' }}>{t('Upload a photo for general, non-diagnostic guidance.', language)}</p>
-              <button type="button" onClick={(e) => { e.stopPropagation(); setActive('Reports'); }} style={{ background: 'transparent', border: 'none', color: '#29d3ff', fontSize: '0.8em', cursor: 'pointer', padding: 0, fontWeight: 'bold' }}>Go to Reports →</button>
-            </div>
-
-            <div 
-              style={{ background: 'rgba(10,20,35,0.6)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', padding: '12px', cursor: 'pointer', transition: 'border-color 0.3s' }}
-              onClick={() => {
-                const text = "Medical Report Explainer: Please upload your lab results, PDFs, or scan images in the 'Reports' tab. I will analyze them and write a plain-language summary with solutions, prescriptions, and diet advice."
-                setMessages(prev => [...prev, { role: 'assistant', text }])
-                if (speechEnabled) speakText(text, language)
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                <strong style={{ fontSize: '0.85em', color: '#a78bfa', textTransform: 'uppercase' }}>{t('Report explainer', language)}</strong>
-                <FileText size={15} style={{ color: '#a78bfa' }} />
-              </div>
-              <p style={{ fontSize: '0.8em', color: '#a3b8cc', margin: '0 0 6px 0' }}>{t('Upload lab results or PDFs for a plain-language summary.', language)}</p>
-              <button type="button" onClick={(e) => { e.stopPropagation(); setActive('Reports'); }} style={{ background: 'transparent', border: 'none', color: '#a78bfa', fontSize: '0.8em', cursor: 'pointer', padding: 0, fontWeight: 'bold' }}>Go to Reports →</button>
-            </div>
-
-            <div 
-              style={{ background: 'rgba(10,20,35,0.6)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', padding: '12px', cursor: 'pointer', transition: 'border-color 0.3s' }}
-              onClick={() => sendWithText("Patient FAQ")}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                <strong style={{ fontSize: '0.85em', color: '#f59e0b', textTransform: 'uppercase' }}>{t('Patient FAQ', language)}</strong>
-                <Brain size={15} style={{ color: '#f59e0b' }} />
-              </div>
-              <p style={{ fontSize: '0.8em', color: '#a3b8cc', margin: '0' }}>{t('Ask direct health questions and get simple answers.', language)}</p>
-            </div>
-
-            <div 
-              style={{ background: 'rgba(10,20,35,0.6)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', padding: '12px', cursor: 'pointer', transition: 'border-color 0.3s' }}
-              onClick={() => sendWithText("Medicine Information")}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                <strong style={{ fontSize: '0.85em', color: '#f472b6', textTransform: 'uppercase' }}>{t('Medicine info', language)}</strong>
-                <Pill size={15} style={{ color: '#f472b6' }} />
-              </div>
-              <p style={{ fontSize: '0.8em', color: '#a3b8cc', margin: '0' }}>{t('General education about medications (no dosing advice).', language)}</p>
-            </div>
+          <div style={{ display: 'flex', gap: '10px' }}>
+             <button style={{ padding: '8px', border: '1px solid #e2e8f0', borderRadius: '8px', background: 'white', color: '#64748b' }}><Download size={18}/></button>
+             <button style={{ padding: '8px', border: '1px solid #e2e8f0', borderRadius: '8px', background: 'white', color: '#64748b' }}><Settings size={18}/></button>
           </div>
         </div>
 
-        {/* Quick questions section */}
-        <div style={{ padding: '10px 15px', background: 'rgba(255,255,255,0.01)', borderBottom: '1px solid rgba(255,255,255,0.03)', display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
-          <span style={{ fontSize: '0.8em', color: '#8aa3b8' }}>{t('Quick questions:', language)}</span>
-          <button 
-            type="button"
-            onClick={() => sendWithText("What are common signs I should see a doctor for?")}
-            style={{ padding: '4px 10px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', color: '#e2e8f0', border: '1px solid rgba(255,255,255,0.1)', fontSize: '0.75em', cursor: 'pointer' }}
-          >
-            {t('Signs to see doctor', language)}
-          </button>
-          <button 
-            type="button"
-            onClick={() => sendWithText("Explain blood pressure readings in simple terms")}
-            style={{ padding: '4px 10px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', color: '#e2e8f0', border: '1px solid rgba(255,255,255,0.1)', fontSize: '0.75em', cursor: 'pointer' }}
-          >
-            {t('Explain Blood Pressure', language)}
-          </button>
-          <button 
-            type="button"
-            onClick={() => sendWithText("Safety-first design")}
-            style={{ padding: '4px 10px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', color: '#e2e8f0', border: '1px solid rgba(255,255,255,0.1)', fontSize: '0.75em', cursor: 'pointer' }}
-          >
-            {t('Safety guidelines', language)}
-          </button>
+        {/* Top Tabs */}
+        <div style={{ display: 'flex', gap: '10px' }}>
+           <button style={{ background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe', padding: '10px 20px', borderRadius: '20px', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px' }}><Check size={16}/> Symptom Analysis</button>
+           <button style={{ background: 'white', color: '#64748b', border: '1px solid #e2e8f0', padding: '10px 20px', borderRadius: '20px', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px' }}><div style={{width:'12px', height:'12px', borderRadius:'50%', border:'2px solid #cbd5e1'}}/> Drug Interactions</button>
+           <button style={{ background: 'white', color: '#64748b', border: '1px solid #e2e8f0', padding: '10px 20px', borderRadius: '20px', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px' }}><Home size={16}/> Dose Calculator</button>
         </div>
 
-        <div className="chat-stream">
-          {messages.map((message, index) => <ChatBubble key={`${message.role}-${index}`} message={message} language={language} />)}
-          {typing && <div className="typing"><span /><span /><span /></div>}
-        </div>
-        <div className="chat-input" style={{ border: listening ? '1px solid #ef4444' : '' }}>
-          <button 
-            type="button"
-            onClick={toggleListen}
-            className={listening ? 'mic-listening-pulse' : ''}
-            style={{ color: listening ? '#ef4444' : '#29d3ff', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-            title="Voice Consult Input"
-          >
-            <Mic size={18} />
-          </button>
-          <input 
-            value={input} 
-            onChange={(event) => setInput(event.target.value)} 
-            onKeyDown={(event) => event.key === 'Enter' && send()} 
-            placeholder={listening ? t('Listening... Speak now.', language) : t('Ask any medical question: fever, cold, cough...', language)} 
-            disabled={listening}
-          />
-          <button type="button" onClick={send} disabled={listening}>{t('Analyze', language)}</button>
-        </div>
-        {rxNotice && (
-          <p className="prescription-sync-note">
-            {rxNotice}. <button type="button" className="linkish" onClick={() => setActive('Prescriptions')}>{t('Open Prescriptions', language)}</button>
-          </p>
-        )}
-      </GlassPanel>
-      <GlassPanel title={t('Live Symptom Triage', language)} action={t('Click to Triage', language)}>
-        <p className="prescription-sync-note" style={{ marginBottom: '10px' }}>
-          Click on any symptom below to immediately consult the AI assistant and generate medical guidance:
-        </p>
-        <div className="symptom-cloud" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '15px' }}>
-          {symptoms.map((item) => (
-            <span 
-              key={item} 
-              className={`cursor-pointer ${detectedSymptoms.includes(item) ? 'detected' : ''}`}
-              onClick={() => sendWithText(`What are the causes and solutions for ${item}?`)}
-              style={{ cursor: 'pointer', padding: '6px 12px', border: detectedSymptoms.includes(item) ? '1px solid #29d3ff' : '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', background: detectedSymptoms.includes(item) ? 'rgba(41,211,255,0.1)' : 'rgba(255,255,255,0.02)', display: 'inline-block', fontSize: '0.8em', transition: 'all 0.3s' }}
-            >
-              {item.charAt(0).toUpperCase() + item.slice(1)}
-            </span>
-          ))}
-        </div>
-        <div style={{ marginTop: '15px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '15px' }}>
-          <h4 style={{ color: '#29d3ff', fontSize: '0.9em', margin: '0 0 10px 0', display: 'flex', alignItems: 'center', gap: '6px' }}><SparkleIcon size={14} /> {t('Quick Symptom Solutions', language)}</h4>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <button 
-              type="button" 
-              onClick={() => sendWithText("I have fever, cold and cough. What solutions and medications should I take?")}
-              style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '8px 12px', color: '#e2e8f0', cursor: 'pointer', fontSize: '0.85em', textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-            >
-              <span>{t('Fever, Cold & Cough Triage', language)}</span>
-              <ChevronRight size={14} style={{ color: '#29d3ff' }} />
-            </button>
-            <button 
-              type="button" 
-              onClick={() => sendWithText("I have stomach pain and acidity. What should I do?")}
-              style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '8px 12px', color: '#e2e8f0', cursor: 'pointer', fontSize: '0.85em', textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-            >
-              <span>{t('Stomach Pain & Acidity Solutions', language)}</span>
-              <ChevronRight size={14} style={{ color: '#29d3ff' }} />
-            </button>
+        {/* Chat Area */}
+        <div style={{ flex: 1, background: 'white', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          <div style={{ flex: 1, overflowY: 'auto', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {messages.map((m, i) => (
+              <div key={i} style={{ display: 'flex', gap: '12px', alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '80%' }}>
+                {m.role !== 'user' && (
+                  <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#0f172a', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', flexShrink: 0 }}>M</div>
+                )}
+                <div style={{ background: m.role === 'user' ? '#3b82f6' : '#f8fafc', color: m.role === 'user' ? 'white' : '#1e293b', border: m.role !== 'user' ? '1px solid #e2e8f0' : 'none', padding: '16px', borderRadius: '16px', borderTopLeftRadius: m.role !== 'user' ? 0 : '16px', borderTopRightRadius: m.role === 'user' ? 0 : '16px', fontSize: '15px', lineHeight: '1.5' }}>
+                  {m.text}
+                </div>
+              </div>
+            ))}
+            {typing && <div style={{ color: '#64748b', fontSize: '14px', fontStyle: 'italic' }}>AI is thinking...</div>}
+          </div>
+
+          <div style={{ padding: '16px', borderTop: '1px solid #e2e8f0', background: '#f8fafc' }}>
+            <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+              <span style={{ fontSize: '12px', background: 'white', padding: '4px 10px', borderRadius: '12px', border: '1px solid #e2e8f0', color: '#64748b', display: 'flex', alignItems: 'center', gap: '6px' }}><Activity size={14}/> HR <b>72 bpm</b></span>
+              <span style={{ fontSize: '12px', background: 'white', padding: '4px 10px', borderRadius: '12px', border: '1px solid #e2e8f0', color: '#64748b', display: 'flex', alignItems: 'center', gap: '6px' }}><HeartPulse size={14}/> BP <b>118/76</b></span>
+            </div>
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', background: 'white', borderRadius: '24px', border: '1px solid #e2e8f0', padding: '4px' }}>
+              <input 
+                value={input} 
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && send()}
+                placeholder="Describe your symptoms, ask a question..." 
+                style={{ flex: 1, border: 'none', background: 'transparent', padding: '12px 16px', outline: 'none', color: '#1e293b' }} 
+              />
+              <div style={{ display: 'flex', gap: '8px', paddingRight: '8px' }}>
+                 <button style={{ background: 'transparent', color: '#64748b', border: 'none', padding: '8px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px' }}><Upload size={16}/> Attach lab report</button>
+                 <button style={{ background: 'transparent', color: '#64748b', border: 'none', padding: '8px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px' }}><Mic size={16}/> Voice</button>
+                 <button onClick={send} style={{ background: '#3b82f6', color: 'white', border: 'none', width: '36px', height: '36px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronRight size={20}/></button>
+              </div>
+            </div>
           </div>
         </div>
-        <div className="translation-card" style={{ marginTop: '15px' }}><Languages /> {language === 'English' ? 'Reply language is set to' : language === 'Hindi' ? 'उत्तर भाषा सेट है' : 'సమాధాన భాష'} <strong>{language}</strong>. {language === 'English' ? 'Detected from chat:' : language === 'Hindi' ? 'चैट से मिला:' : 'చాట్ నుంచి గుర్తించినవి:'} <strong>{detectedSymptoms.length ? detectedSymptoms.join(', ') : language === 'English' ? 'none yet' : language === 'Hindi' ? 'अभी कुछ नहीं' : 'ఇంకా ఏమీ లేదు'}</strong></div>
-        <EmergencyMini severe={severe} language={language} />
-      </GlassPanel>
+      </div>
+
+      {/* Right Column: Patient Profile Context */}
+      <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <div style={{ display: 'flex', borderBottom: '1px solid #e2e8f0' }}>
+           <button style={{ flex: 1, padding: '16px', background: 'white', border: 'none', borderBottom: '2px solid #3b82f6', color: '#3b82f6', fontWeight: '600' }}>Profile</button>
+           <button style={{ flex: 1, padding: '16px', background: '#f8fafc', border: 'none', color: '#64748b', fontWeight: '500' }}>Meds</button>
+           <button style={{ flex: 1, padding: '16px', background: '#f8fafc', border: 'none', color: '#64748b', fontWeight: '500' }}>Schedule</button>
+        </div>
+        <div style={{ padding: '24px', overflowY: 'auto' }}>
+           
+           {/* Quick Vitals */}
+           <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
+              <div style={{ flex: 1, padding: '16px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                 <div style={{ color: '#64748b', fontSize: '12px', marginBottom: '4px' }}>Blood Glucose</div>
+                 <div style={{ color: '#16a34a', fontSize: '24px', fontWeight: 'bold' }}>104 <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 'normal' }}>mg/dL · Normal</span></div>
+              </div>
+              <div style={{ flex: 1, padding: '16px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                 <div style={{ color: '#64748b', fontSize: '12px', marginBottom: '4px' }}>Oxygen Sat.</div>
+                 <div style={{ color: '#0f766e', fontSize: '24px', fontWeight: 'bold' }}>98<span style={{ fontSize: '16px' }}>%</span> <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 'normal' }}>SpO₂ · Normal</span></div>
+              </div>
+           </div>
+
+           {/* Allergies */}
+           <div style={{ marginBottom: '24px' }}>
+              <div style={{ color: '#64748b', fontSize: '12px', fontWeight: 'bold', letterSpacing: '1px', marginBottom: '12px' }}>ALLERGIES</div>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                 <span style={{ background: '#fee2e2', color: '#dc2626', padding: '6px 12px', borderRadius: '20px', fontSize: '13px', fontWeight: '500' }}>Penicillin</span>
+                 <span style={{ background: '#fee2e2', color: '#dc2626', padding: '6px 12px', borderRadius: '20px', fontSize: '13px', fontWeight: '500' }}>Sulfa drugs</span>
+                 <span style={{ background: '#fef3c7', color: '#d97706', padding: '6px 12px', borderRadius: '20px', fontSize: '13px', fontWeight: '500' }}>Ibuprofen (mild)</span>
+              </div>
+           </div>
+
+           {/* Medical History */}
+           <div style={{ marginBottom: '24px' }}>
+              <div style={{ color: '#64748b', fontSize: '12px', fontWeight: 'bold', letterSpacing: '1px', marginBottom: '12px' }}>MEDICAL HISTORY</div>
+              <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '10px', color: '#475569', fontSize: '14px' }}>
+                 <li>• Hypertension (2019)</li>
+                 <li>• Pre-diabetes (2022)</li>
+                 <li>• Appendectomy (2015)</li>
+                 <li>• Mild asthma (childhood)</li>
+              </ul>
+           </div>
+
+           {/* Emergency Contact */}
+           <div>
+              <div style={{ color: '#64748b', fontSize: '12px', fontWeight: 'bold', letterSpacing: '1px', marginBottom: '12px' }}>EMERGENCY CONTACT</div>
+              <div style={{ color: '#1e293b', fontSize: '14px', fontWeight: '500' }}>Jane Doe</div>
+              <div style={{ color: '#64748b', fontSize: '14px' }}>Spouse · +91 98765 43210</div>
+           </div>
+
+        </div>
+      </div>
     </div>
   )
 }
