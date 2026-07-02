@@ -342,7 +342,19 @@ Please extract and infer the following details. Respond ONLY with a valid JSON o
     }
   } catch (error) {
     console.error('Error analyzing image via Gemini API, using smart local fallback:', error)
-    return getSmartFallback()
+    
+    // Check if it's a known medical file based on name, otherwise return the actual error so the user knows what went wrong!
+    const fallback = getSmartFallback();
+    if (fallback.disease === 'Healthy / Normal') {
+       return {
+         disease: 'AI Processing Error',
+         analysis: 'The AI failed to analyze this report. Error details: ' + (error.message || String(error)) + '. Please ensure your GEMINI_API_KEY is valid and the file is a supported image/pdf.',
+         solution: 'Try uploading a clearer image or check your API configuration.',
+         prescription: 'N/A',
+         foodSuggestions: 'N/A'
+       };
+    }
+    return fallback;
   }
 }
 
