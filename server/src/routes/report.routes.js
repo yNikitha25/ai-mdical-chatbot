@@ -3,7 +3,6 @@ const multer = require('multer')
 const Report = require('../models/Report')
 const { protect } = require('../middleware/auth')
 const { analyzeReportImage } = require('../services/ai.service')
-const { uploadBufferToCloudinary } = require('../config/cloudinary')
 
 const router = express.Router()
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } })
@@ -13,7 +12,8 @@ router.post('/upload', protect, upload.array('reports', 6), async (req, res, nex
     const files = req.files || []
     const reports = await Promise.all(
       files.map(async (file) => {
-        const cloudResult = await uploadBufferToCloudinary(file.buffer)
+        // Bypass Cloudinary to prevent crashes if API keys are missing. Store as base64 in MongoDB.
+        const base64Data = \`data:\${file.mimetype};base64,\${file.buffer.toString('base64')}\`;
         const aiResult = await analyzeReportImage(file.buffer, file.mimetype, file.originalname)
         
         return Report.create({
@@ -21,8 +21,8 @@ router.post('/upload', protect, upload.array('reports', 6), async (req, res, nex
           filename: file.originalname,
           originalName: file.originalname,
           mimeType: file.mimetype,
-          path: cloudResult.secure_url,
-          cloudinaryUrl: cloudResult.secure_url,
+          path: base64Data,
+          cloudinaryUrl: base64Data,
           ocrText: 'Analyzed by MediVision AI',
           summary: aiResult.analysis || 'AI analysis complete.',
           predictions: [{ disease: aiResult.disease || 'Unknown Condition', confidence: 95 }],
