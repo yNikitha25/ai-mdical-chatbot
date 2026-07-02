@@ -536,63 +536,6 @@ function loadReminders(consultation) {
 }
 
 
-function Appointments() {
-  return (
-    <div style={{ padding: '30px', maxWidth: '900px', margin: '0 auto', height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-        <div>
-          <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#1e293b', margin: '0 0 8px 0' }}>Appointments</h1>
-          <p style={{ color: '#64748b', margin: 0 }}>Manage your upcoming and past medical visits.</p>
-        </div>
-        <button style={{ background: '#3b82f6', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '8px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <CalendarClock size={18} />
-          Book Appointment
-        </button>
-      </div>
-
-      <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-        <div style={{ padding: '20px', borderBottom: '1px solid #e2e8f0', background: '#f8fafc' }}>
-          <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#1e293b', margin: 0 }}>Upcoming Visits</h2>
-        </div>
-        
-        <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', border: '1px solid #e2e8f0', borderRadius: '12px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#eff6ff', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '18px' }}>
-                <Stethoscope size={24} />
-              </div>
-              <div>
-                <h3 style={{ margin: '0 0 4px 0', fontSize: '16px', color: '#1e293b', fontWeight: '600' }}>Dr. Sarah Jenkins</h3>
-                <p style={{ margin: 0, color: '#64748b', fontSize: '14px' }}>Cardiologist · General Checkup</p>
-              </div>
-            </div>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ color: '#0f766e', fontWeight: '600', fontSize: '15px', marginBottom: '4px' }}>Tomorrow, 10:00 AM</div>
-              <div style={{ color: '#64748b', fontSize: '13px' }}>City Hospital, Wing B</div>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', border: '1px solid #e2e8f0', borderRadius: '12px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#fef2f2', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '18px' }}>
-                <Activity size={24} />
-              </div>
-              <div>
-                <h3 style={{ margin: '0 0 4px 0', fontSize: '16px', color: '#1e293b', fontWeight: '600' }}>Dr. Michael Chen</h3>
-                <p style={{ margin: 0, color: '#64748b', fontSize: '14px' }}>Neurologist · Migraine Follow-up</p>
-              </div>
-            </div>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ color: '#1e293b', fontWeight: '600', fontSize: '15px', marginBottom: '4px' }}>Oct 24, 2026, 2:30 PM</div>
-              <div style={{ color: '#64748b', fontSize: '13px' }}>Virtual Consultation</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 function App() {
   const [authed, setAuthed] = useState(Boolean(localStorage.getItem('medivision_token')))
   const [authView, setAuthView] = useState('signin')
@@ -769,7 +712,7 @@ function AuthShell({ view, setView, onAuthed }) {
               {item === 'signin' ? 'Sign In' : 'Sign Up'}
             </button>
           ))}
-            {active === 'Appointments' && <Appointments />}
+            
         </div>
         <h2>{titles[view]}</h2>
         {view === 'signup' && <Input icon={User} placeholder="Full name" value={form.name} onChange={(name) => setForm({ ...form, name })} />}
@@ -802,11 +745,13 @@ function Input({ icon: Icon, onChange, ...props }) {
 
 function Sidebar({ active, setActive, onLogout, language }) {
   const customNav = [
-    { label: 'AI Consultation', state: 'AI Chat', icon: Brain },
+    { label: 'AI Chat', state: 'AI Chat', icon: Brain },
     { label: 'Symptom Checker', state: 'Analysis', icon: Activity },
-    { label: 'Lab Results', state: 'Reports', icon: FileText },
-    { label: 'Medications', state: 'Prescriptions', icon: Pill },
-    { label: 'Appointments', state: 'Appointments', icon: CalendarClock },
+    { label: 'Medical Reports', state: 'Reports', icon: FileText },
+    { label: 'Prescriptions', state: 'Prescriptions', icon: Pill },
+    { label: 'Reminders', state: 'Dashboard', icon: Bell },
+    { label: 'Analytics', state: 'Health Analytics', icon: BarChart },
+    { label: 'Emergency', state: 'Emergency Alerts', icon: AlertTriangle },
   ];
 
   return (

@@ -1546,3 +1546,26 @@ button.linkish {
   .scan-legend { right: 12px; bottom: 88px; }
   .scan-top-strip { display: grid; }
 }
+
+
+/* .clinical-overrides */
+.glass-panel, .hero-panel, .metric, .auth-card, .auth-visual, .scanner-card, .emergency-card {
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  border: 1px solid #e2e8f0;
+}
+.panel-head span, .eyebrow, .food-card span, .medical-card span, .report-tags span {
+  color: #64748b !important;
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+}
+.hero-panel p, .auth-visual p {
+  color: #475569 !important;
+}
+.metric h3 { color: #64748b !important; }
+.metric .value { color: #0f172a !important; }
+.medicine-card, .analysis-metric, .organ-card { 
+  background: #f8fafc !important; 
+  border: 1px solid #e2e8f0 !important; 
+  color: #1e293b !important;
+}
+.medicine-card p, .organ-card p { color: #64748b !important; }
