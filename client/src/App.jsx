@@ -1793,6 +1793,16 @@ function Reports({ consultation, setConsultation, setActive, language }) {
 
   const handleUpload = async (e) => {
     if (!e.target.files.length) return
+    
+    // Check file sizes (Vercel has a 4.5MB limit, let's limit to 4MB)
+    const MAX_SIZE = 4 * 1024 * 1024; // 4MB
+    for (let i = 0; i < e.target.files.length; i++) {
+      if (e.target.files[i].size > MAX_SIZE) {
+        alert(\`The file "\${e.target.files[i].name}" is too large! Please upload an image smaller than 4MB.\`);
+        return;
+      }
+    }
+
     setIsUploading(true)
     const formData = new FormData()
     for (let i = 0; i < e.target.files.length; i++) {
