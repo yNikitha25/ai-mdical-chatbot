@@ -850,6 +850,8 @@ function App() {
               />
             )}
             {active === 'Analysis' && <Analysis consultation={consultation} language={language} />}
+            {active === 'Clinical Scribe' && <ClinicalScribe />}
+            {active === 'Drug Checker' && <DrugChecker />}
             {active === '3D Visualization' && <Visualization language={language} />}
             {active === 'Prescriptions' && (
               <Prescriptions 
