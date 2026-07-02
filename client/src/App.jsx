@@ -847,6 +847,7 @@ function App() {
                 setPendingVoiceInput={setPendingVoiceInput} 
                 language={language}
                 setLanguage={setLanguage}
+                reports={reports}
               />
             )}
             {active === 'Analysis' && <Analysis consultation={consultation} language={language} />}
@@ -1224,7 +1225,7 @@ function HeroPanel({ setActive }) {
   )
 }
 
-function AIChat({ setActive, consultation, setConsultation, pendingVoiceInput, setPendingVoiceInput, language, setLanguage }) {
+function AIChat({ setActive, consultation, setConsultation, pendingVoiceInput, setPendingVoiceInput, language, setLanguage, reports }) {
   const [messages, setMessages] = useState(initialMessages)
   const [input, setInput] = useState('')
   const [typing, setTyping] = useState(false)
