@@ -44,11 +44,11 @@ async function generateMedicalReply(message, history = [], language = 'English')
     }
   }
 
-  if (process.env.GEMINI_API_KEY) {
-    try {
-      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
-      const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || 'gemini-2.5-flash' })
-      const transcript = chatHistory
+    if (process.env.GEMINI_API_KEY) {
+      try {
+        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
+        const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || 'gemini-1.5-flash' })
+        const transcript = chatHistory
         .map((item) => `${item.role === 'user' ? 'Patient' : 'Assistant'}: ${item.text}`)
         .join('\n')
       const response = await model.generateContent(
