@@ -764,7 +764,8 @@ function DrugChecker() {
 }
 
 function App() {
-  const [authed, setAuthed] = useState(Boolean(localStorage.getItem('medivision_token')))
+  // Authentication completely bypassed as requested
+  const [authed, setAuthed] = useState(true)
   const [authView, setAuthView] = useState('signin')
   const [active, setActive] = useState('AI Chat')
   const [theme, setTheme] = useState('dark')
