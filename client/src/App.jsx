@@ -1464,7 +1464,11 @@ function Analysis({ consultation, language }) {
             </div>
             <div>
               <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#1e293b', marginBottom: '8px' }}>Severity</label>
-              <select style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '10px', outline: 'none', background: '#fff', color: '#1e293b' }}>
+              <select 
+                value={severity}
+                onChange={(e) => setSeverity(e.target.value)}
+                style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '10px', outline: 'none', background: '#fff', color: '#1e293b' }}
+              >
                 <option>How bad?</option>
                 <option>Mild</option>
                 <option>Moderate</option>
@@ -1473,17 +1477,35 @@ function Analysis({ consultation, language }) {
             </div>
           </div>
           
-          <button style={{ width: '100%', background: '#71c4c1', color: '#fff', padding: '14px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '16px', cursor: 'pointer' }}>Analyze Symptoms</button>
+          <button onClick={handleAnalyze} disabled={isAnalyzing} style={{ width: '100%', background: '#71c4c1', color: '#fff', padding: '14px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '16px', cursor: isAnalyzing ? 'not-allowed' : 'pointer', opacity: isAnalyzing ? 0.7 : 1 }}>
+            {isAnalyzing ? 'Analyzing...' : 'Analyze Symptoms'}
+          </button>
         </div>
         
-        <div style={{ background: '#f0fdfa', borderRadius: '16px', padding: '24px', border: '1px solid #ccfbf1' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <h2 style={{ margin: 0, fontSize: '18px', color: '#0f3c3a' }}>Assessment Result</h2>
-            <span style={{ background: '#d1fae5', color: '#065f46', padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px' }}><Check size={14}/> Low</span>
+        {result && (
+          <div style={{ background: '#f0fdfa', borderRadius: '16px', padding: '24px', border: '1px solid #ccfbf1' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <h2 style={{ margin: 0, fontSize: '18px', color: '#0f3c3a' }}>Assessment Result</h2>
+              <span style={{ background: result.emergency ? '#fee2e2' : '#d1fae5', color: result.emergency ? '#ef4444' : '#065f46', padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                {result.emergency ? <AlertTriangle size={14} /> : <Check size={14}/>} 
+                {result.emergency ? 'High Risk' : 'Low Risk'}
+              </span>
+            </div>
+            <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#64748b', letterSpacing: '1px', marginBottom: '8px' }}>POSSIBLE CONDITIONS</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {result.diseases && result.diseases.length > 0 ? (
+                result.diseases.map(d => (
+                  <div key={d.name} style={{ display: 'flex', justifyContent: 'space-between', background: '#fff', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                    <span style={{ color: '#1e293b', fontWeight: '500' }}>{d.name}</span>
+                    <span style={{ color: '#0ea5e9' }}>{d.confidence}% match</span>
+                  </div>
+                ))
+              ) : (
+                <p style={{ color: '#1e293b', margin: 0, fontSize: '14px' }}>No specific condition detected from the provided text.</p>
+              )}
+            </div>
           </div>
-          <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#64748b', letterSpacing: '1px', marginBottom: '8px' }}>POSSIBLE CONDITIONS</div>
-          <p style={{ color: '#1e293b', margin: 0, fontSize: '14px' }}>No specific condition detected from the provided text.</p>
-        </div>
+        )}
       </div>
       
       <div style={{ background: '#fff', borderRadius: '16px', padding: '24px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', marginTop: '68px' }}>
