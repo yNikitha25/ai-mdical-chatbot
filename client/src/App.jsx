@@ -1881,8 +1881,10 @@ function Reports({ consultation, setConsultation, setActive, language, reports, 
               ? ['allergy'] 
               : (prev?.symptoms || [])
           }))
+          setReports(prev => [report, ...prev])
         }
-        await fetchReports()
+        // DB is bypassed, so don't fetch empty array from backend
+        // await fetchReports()
       }
     } catch (err) {
       console.error(err)
