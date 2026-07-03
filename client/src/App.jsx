@@ -776,6 +776,26 @@ function App() {
   })
   const [pendingVoiceInput, setPendingVoiceInput] = useState('')
   const [reminders, setReminders] = useState(() => loadReminders(consultation))
+  const [reports, setReports] = useState([])
+
+  const fetchReports = async () => {
+    try {
+      const token = localStorage.getItem('medivision_token')
+      const headers = {}
+      if (token) headers['Authorization'] = `Bearer ${token}`
+      const res = await fetch(`${API_URL}/reports`, { headers })
+      if (res.ok) {
+        const data = await res.json()
+        setReports(data.reports || [])
+      }
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  useEffect(() => {
+    fetchReports()
+  }, [])
 
   useEffect(() => {
     sessionStorage.setItem('medivision_consultation', JSON.stringify(consultation))
@@ -874,6 +894,8 @@ function App() {
                 setConsultation={setConsultation} 
                 setActive={setActive} 
                 language={language}
+                reports={reports}
+                fetchReports={fetchReports}
               />
             )}
             {active === 'Emergency Alerts' && <EmergencyAlerts language={language} />}
@@ -1771,29 +1793,8 @@ function EmergencyAlerts({ language }) {
   )
 }
 
-function Reports({ consultation, setConsultation, setActive, language }) {
-  const [reports, setReports] = useState([])
+function Reports({ consultation, setConsultation, setActive, language, reports, fetchReports }) {
   const [isUploading, setIsUploading] = useState(false)
-
-  const fetchReports = async () => {
-    try {
-      const res = await fetch(`${API_URL}/reports`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('medivision_token')}`
-        }
-      })
-      const data = await res.json()
-      if (data.reports) {
-        setReports(data.reports)
-      }
-    } catch (e) {
-      console.error(e)
-    }
-  }
-
-  useEffect(() => {
-    fetchReports()
-  }, [])
 
   const handleUpload = async (e) => {
     if (!e.target.files.length) return
