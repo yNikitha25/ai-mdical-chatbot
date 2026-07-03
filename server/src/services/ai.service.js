@@ -351,10 +351,11 @@ async function analyzeReportImage(bufferOrPath, mimeType, originalName = '') {
       },
     }
 
-    const prompt = `You are an expert medical AI assistant. Analyze the provided test report or medical image.
+const prompt = `You are an expert medical AI assistant. Analyze the provided test report or medical image.
 Please extract and infer the following details. Respond ONLY with a valid JSON object using this structure:
 {
   "analysis": "A detailed explanation of what happened or the results found in the report.",
+  "results": "Key values, measurements, or direct medical findings from the report in bullet points.",
   "solution": "Recommended immediate solution or action plan.",
   "prescription": "Suggested prescription or medicines (with a disclaimer to consult a doctor).",
   "foodSuggestions": "Specific diet or food to be taken for recovery.",
@@ -376,6 +377,7 @@ Please extract and infer the following details. Respond ONLY with a valid JSON o
 
     return {
       analysis: parsed.analysis || 'Analysis not available.',
+      results: parsed.results || 'No specific findings extracted.',
       solution: parsed.solution || 'No solution recommended.',
       prescription: parsed.prescription || 'No specific prescription.',
       foodSuggestions: parsed.foodSuggestions || 'Regular diet.',

@@ -12,6 +12,7 @@ const ReportSchema = new mongoose.Schema(
     summary: String,
     predictions: [{ disease: String, confidence: Number }],
     analysis: String,
+    results: String,
     solution: String,
     prescription: String,
     foodSuggestions: String,

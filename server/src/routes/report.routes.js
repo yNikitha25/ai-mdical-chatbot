@@ -27,6 +27,7 @@ router.post('/upload', protect, upload.array('reports', 6), async (req, res, nex
           summary: aiResult.analysis || 'AI analysis complete.',
           predictions: [{ disease: aiResult.disease || 'Unknown Condition', confidence: 95 }],
           analysis: aiResult.analysis,
+          results: aiResult.results,
           solution: aiResult.solution,
           prescription: aiResult.prescription,
           foodSuggestions: aiResult.foodSuggestions,
