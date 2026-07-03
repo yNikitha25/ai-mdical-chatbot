@@ -218,6 +218,7 @@ async function analyzeReportImage(bufferOrPath, mimeType, originalName = '') {
       return {
         disease: 'Stage 3 Kidney Dysfunction',
         analysis: 'Renal function profile indicates elevated Serum Creatinine (1.8 mg/dL) and Blood Urea Nitrogen (BUN) (28 mg/dL) with an estimated GFR of 45 mL/min/1.73m², consistent with Stage 3 Moderate Kidney Dysfunction.',
+        results: '• Serum Creatinine: 1.8 mg/dL (High)\n• Blood Urea Nitrogen: 28 mg/dL (High)\n• eGFR: 45 mL/min/1.73m² (Low)',
         solution: 'Maintain strict blood pressure control (<130/80), avoid nephrotoxic medicines like NSAIDs (ibuprofen/diclofenac), and seek consultation with a nephrologist.',
         prescription: 'Sodium Bicarbonate - 500 mg - Twice daily after food, Torsemide - 10 mg - Once daily in the morning if swelling is present (consult doctor)',
         foodSuggestions: 'Eat: Low-sodium, low-potassium, and low-phosphorus foods (apples, cauliflower, white rice). Avoid: Bananas, spinach, tomatoes, high-protein red meats, and dark cola beverages.'
@@ -227,6 +228,7 @@ async function analyzeReportImage(bufferOrPath, mimeType, originalName = '') {
       return {
         disease: 'Cerebral Atrophy / Ischemia',
         analysis: 'Brain MRI / CT scan reports age-related cerebral atrophy and chronic microvascular ischemic changes in the periventricular white matter. No acute infarct or hemorrhage is detected.',
+        results: '• Cerebral Atrophy: Present (Age-related)\n• Microvascular Ischemia: Mild periventricular changes\n• Acute Infarct: None detected\n• Hemorrhage: None detected',
         solution: 'Manage cardiovascular risk parameters, participate in regular cognitive exercises, keep active daily, and seek neurological follow-up.',
         prescription: 'Aspirin - 75 mg - Once daily after lunch, Atorvastatin - 10 mg - Once daily at night (consult doctor)',
         foodSuggestions: 'Eat: Mediterranean diet rich in antioxidants (blueberries, walnuts, olive oil, leafy greens). Avoid: High-sodium products, trans fats, refined sugars, and excessive alcohol.'
@@ -236,6 +238,7 @@ async function analyzeReportImage(bufferOrPath, mimeType, originalName = '') {
       return {
         disease: 'Grade I/II Fatty Liver',
         analysis: 'Liver Function Test (LFT) reveals elevated ALT (SGPT) at 68 U/L and AST (SGOT) at 55 U/L with mild echogenic hepatic texture, suggesting Grade I/II fatty liver changes (hepatic steatosis).',
+        results: '• ALT (SGPT): 68 U/L (Elevated)\n• AST (SGOT): 55 U/L (Elevated)\n• Ultrasound Texture: Mild echogenic (Fatty infiltrate)',
         solution: 'Gradual weight reduction (5-10%), complete avoidance of alcohol, regular cardiovascular exercise, and re-checking LFT in 6 weeks.',
         prescription: 'Ursodeoxycholic Acid (UDCA) - 300 mg - Twice daily after food, Vitamin E - 400 IU - Once daily after breakfast (consult doctor)',
         foodSuggestions: 'Eat: High-fiber foods, legumes, green tea, oats, and cruciferous vegetables like broccoli. Avoid: Alcohol, refined sugar, high-fructose corn syrup, and saturated fats.'
@@ -245,6 +248,7 @@ async function analyzeReportImage(bufferOrPath, mimeType, originalName = '') {
       return {
         disease: 'Chronic Bronchitis',
         analysis: 'Chest X-ray shows bilateral increased bronchovascular markings and hyperinflated lung fields, suggesting chronic bronchitis or mild bronchial inflammation/infection.',
+        results: '• Bronchovascular markings: Increased bilaterally\n• Lung fields: Hyperinflated\n• Pleural effusion: None',
         solution: 'Avoid environmental triggers (smoke, dust, cold air), perform deep breathing exercises, and follow up with a pulmonologist.',
         prescription: 'Levosalbutamol Inhaler - 50 mcg - 2 puffs as needed for shortness of breath, Montelukast - 10 mg - Once daily at night (consult doctor)',
         foodSuggestions: 'Eat: Warm soups, ginger-honey tea, garlic, citrus fruits, and foods rich in Vitamin D. Avoid: Very cold drinks, ice cream, and mucus-generating processed foods.'
@@ -254,6 +258,7 @@ async function analyzeReportImage(bufferOrPath, mimeType, originalName = '') {
       return {
         disease: 'Subclinical Hypothyroidism',
         analysis: 'Thyroid profile shows elevated TSH (7.2 uIU/mL) with normal free T3 and T4 levels, suggesting subclinical hypothyroidism.',
+        results: '• TSH: 7.2 uIU/mL (High)\n• Free T3: Normal range\n• Free T4: Normal range',
         solution: 'Monitor TSH level in 3 months, ensure adequate dietary iodine intake, manage stress, and consult an endocrinologist.',
         prescription: 'Levothyroxine Sodium - 25 mcg - Once daily in morning on empty stomach (30 mins before food) (consult doctor)',
         foodSuggestions: 'Eat: Seafood, iodized salt, eggs, dairy, and selenium-rich foods like sunflower seeds. Avoid: Excessive raw goitrogenic vegetables (cabbage, kale, broccoli) and soy products.'
@@ -263,6 +268,7 @@ async function analyzeReportImage(bufferOrPath, mimeType, originalName = '') {
       return {
         disease: 'Cardiac Stress / Hypertension',
         analysis: 'Electrocardiogram (ECG) shows mild ST-segment changes suggesting potential myocardial stress or blockage risk near coronary flow pathways. Blood pressure reading of 145/95 mmHg is elevated.',
+        results: '• Blood Pressure: 145/95 mmHg (Elevated)\n• ECG: Mild ST-segment changes\n• Heart Rate: 88 bpm (Normal)',
         solution: 'Reduce physical strain immediately, monitor BP twice daily, avoid high-sodium meals, and schedule a cardiologist consultation for an echocardiogram.',
         prescription: 'Amlodipine - 5 mg - Once daily in the morning, Paracetamol - 500 mg - Every 8 hours if experiencing mild chest wall pressure/headache',
         foodSuggestions: 'Eat: Low-sodium meals, garlic, oatmeal, bananas (rich in potassium), and green tea. Avoid: Salt, pickles, processed meats, caffeine, and deep-fried foods.'
@@ -272,6 +278,7 @@ async function analyzeReportImage(bufferOrPath, mimeType, originalName = '') {
       return {
         disease: 'Type 2 Diabetes',
         analysis: 'Elevated Fasting Blood Glucose (148 mg/dL) and HbA1c (7.2%). This indicates poorly controlled blood sugar levels consistent with Type 2 Diabetes.',
+        results: '• Fasting Blood Glucose: 148 mg/dL (High)\n• HbA1c: 7.2% (Diabetic Range)',
         solution: 'Regularly monitor blood glucose levels (fasting and post-meal), walk for 30 minutes after major meals, and consult an endocrinologist for custom medication dosing.',
         prescription: 'Metformin - 500 mg - Once daily with dinner (after food), ORS / hydration - 250 ml - Drink daily to maintain electrolyte balance',
         foodSuggestions: 'Eat: Fiber-rich whole grains (oats, brown rice), leafy greens, lean proteins, and cinnamon water. Avoid: Refined sugar, white bread, soda, sweet juices, and fried items.'
@@ -281,6 +288,7 @@ async function analyzeReportImage(bufferOrPath, mimeType, originalName = '') {
       return {
         disease: 'Contact Dermatitis / Eczema',
         analysis: 'Skin examination indicates localized mild contact dermatitis / dry skin eczema pattern. There is minor epidermal inflammation with no signs of secondary bacterial infection.',
+        results: '• Inflammation Pattern: Localized epidermal erythema\n• Lesion Type: Maculopapular (Dry skin pattern)\n• Bacterial Infection: None detected',
         solution: 'Apply cool compresses, avoid harsh soaps, keep the skin hydrated with a gentle ceramide moisturizer, and avoid scratching the affected area to prevent infection.',
         prescription: 'Hydrocortisone Cream 1% - Topical - Apply thin layer twice daily to affected area for up to 5 days, Cetirizine - 10 mg - Once daily at night for allergy relief, Paracetamol - 500 mg - Every 8 hours if experiencing mild itching-related discomfort',
         foodSuggestions: 'Eat: Vitamin C rich foods (citrus fruits, berries), omega-3 rich food (walnuts, chia seeds), and drink plenty of water. Avoid: Shellfish, highly processed foods, and foods with artificial colorings that might trigger histamine response.'
@@ -290,6 +298,7 @@ async function analyzeReportImage(bufferOrPath, mimeType, originalName = '') {
       return {
         disease: 'Iron-Deficiency Anemia',
         analysis: 'Complete Blood Count (CBC) indicates a low Hemoglobin level of 10.2 g/dL (normal range: 12-16 g/dL for females, 13-17 g/dL for males) and low serum iron, suggesting mild iron-deficiency anemia.',
+        results: '• Hemoglobin: 10.2 g/dL (Low)\n• RBC Count: Marginally low\n• WBC / Platelets: Within normal limits',
         solution: 'Increase dietary iron and vitamin C absorption, avoid drinking tea or coffee immediately after meals, and repeat blood tests in 4 weeks.',
         prescription: 'Iron supplement (Ferrous Ascorbate) - 100 mg - Once daily after food, Vitamin C - 500 mg - Once daily with iron supplement to boost absorption',
         foodSuggestions: 'Eat: Iron-rich foods like spinach, lentils, beans, fortified cereals, beets, and pomegranate. Avoid: Excess calcium supplements or tea/coffee during meals, as they inhibit iron absorption.'
@@ -299,6 +308,7 @@ async function analyzeReportImage(bufferOrPath, mimeType, originalName = '') {
     return {
       disease: 'Healthy / Normal',
       analysis: 'General health screening report is within normal clinical parameters. Minor indicators show mild dehydration and high stress markers.',
+      results: '• Vitals: Within normal range\n• Major Organ Functions: Unremarkable\n• Hydration Markers: Mild dehydration indicated',
       solution: 'Ensure 8 hours of sleep, reduce stress via mindfulness, drink at least 3 liters of water daily, and follow up annually.',
       prescription: 'Multivitamin supplement - 1 tablet - Once daily after breakfast, ORS / hydration - 250 ml - Drink twice daily for rehydration',
       foodSuggestions: 'Eat: Balanced fresh fruits, leafy vegetables, sprouts, and curd/yogurt. Avoid: Junk foods, carbonated drinks, and excessive caffeine.'
