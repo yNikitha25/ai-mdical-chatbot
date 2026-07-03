@@ -16,7 +16,8 @@ router.post('/upload', protect, upload.array('reports', 6), async (req, res, nex
         const base64Data = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
         const aiResult = await analyzeReportImage(file.buffer, file.mimetype, file.originalname)
         
-        return Report.create({
+        const reportData = {
+          _id: Math.random().toString(36).substring(7),
           user: req.user?._id,
           filename: file.originalname,
           originalName: file.originalname,
@@ -31,7 +32,15 @@ router.post('/upload', protect, upload.array('reports', 6), async (req, res, nex
           solution: aiResult.solution,
           prescription: aiResult.prescription,
           foodSuggestions: aiResult.foodSuggestions,
-        })
+          createdAt: new Date().toISOString()
+        }
+        
+        // If MongoDB is connected, save it. Otherwise just return the object.
+        const mongoose = require('mongoose')
+        if (mongoose.connection.readyState === 1) {
+           return Report.create(reportData)
+        }
+        return reportData
       })
     )
     res.status(201).json({ reports })
@@ -42,6 +51,10 @@ router.post('/upload', protect, upload.array('reports', 6), async (req, res, nex
 
 router.get('/', protect, async (req, res, next) => {
   try {
+    const mongoose = require('mongoose')
+    if (mongoose.connection.readyState !== 1) {
+      return res.json({ reports: [] })
+    }
     const reports = await Report.find({ user: req.user?._id }).sort({ createdAt: -1 })
     res.json({ reports })
   } catch (error) {
