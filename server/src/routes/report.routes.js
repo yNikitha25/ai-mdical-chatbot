@@ -13,7 +13,7 @@ router.post('/upload', protect, upload.array('reports', 6), async (req, res, nex
     const reports = await Promise.all(
       files.map(async (file) => {
         // Bypass Cloudinary to prevent crashes if API keys are missing. Store as base64 in MongoDB.
-        const base64Data = \`data:\${file.mimetype};base64,\${file.buffer.toString('base64')}\`;
+        const base64Data = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
         const aiResult = await analyzeReportImage(file.buffer, file.mimetype, file.originalname)
         
         return Report.create({

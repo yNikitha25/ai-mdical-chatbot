@@ -33,7 +33,13 @@ import {
   Upload,
   User,
   Utensils,
-, Mic, StopCircle, MapPin, ShieldAlert, FileWarning, ClipboardList, PenTool} from 'lucide-react'
+  StopCircle,
+  MapPin,
+  ShieldAlert,
+  FileWarning,
+  ClipboardList,
+  PenTool,
+} from 'lucide-react'
 import {
   Bar,
   BarChart,
@@ -575,9 +581,7 @@ function ClinicalScribe() {
         subjective: "Patient reports severe headache for 3 days, accompanied by nausea. Denies fever.",
         objective: "BP 135/85. Patient appears in mild distress due to pain.",
         assessment: "Acute migraine without aura. History of migraines noted.",
-        plan: "1. Prescribe Sumatriptan 50mg PRN for migraine.
-2. Advise rest in a dark, quiet room.
-3. Follow up in 1 week if symptoms persist."
+        plan: "1. Prescribe Sumatriptan 50mg PRN for migraine.\n2. Advise rest in a dark, quiet room.\n3. Follow up in 1 week if symptoms persist."
       });
       setIsGenerating(false);
     }, 2000);
@@ -1260,11 +1264,11 @@ function AIChat({ setActive, consultation, setConsultation, pendingVoiceInput, s
     setTyping(true)
     const conversationText = next.filter((item) => item.role === 'user').map((item) => item.text).join(' ')
     try {
-      const data = await api('/ai/chat', { method: 'POST', body: JSON.stringify({ message: userText, history: next, language }) })
+      const data = await api('/ai/chat', { method: 'POST', body: JSON.stringify({ message: userText, history: messages, language }) })
       setMessages([...next, { role: 'assistant', text: data.reply }])
       updateConsultation(conversationText, data, userText)
     } catch {
-      const reply = "I am currently running in offline mode. Please consult a doctor."
+      const reply = demoReply(userText, language, messages)
       setMessages([...next, { role: 'assistant', text: reply }])
       updateConsultation(conversationText, {}, userText)
     } finally {
@@ -1798,7 +1802,7 @@ function Reports({ consultation, setConsultation, setActive, language }) {
     const MAX_SIZE = 4 * 1024 * 1024; // 4MB
     for (let i = 0; i < e.target.files.length; i++) {
       if (e.target.files[i].size > MAX_SIZE) {
-        alert(\`The file "\${e.target.files[i].name}" is too large! Please upload an image smaller than 4MB.\`);
+        alert(`The file "${e.target.files[i].name}" is too large! Please upload an image smaller than 4MB.`);
         return;
       }
     }

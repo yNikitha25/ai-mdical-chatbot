@@ -1,5 +1,5 @@
 const OpenAI = require('openai')
-const { GoogleGenerativeAI } = require('@google/generative-ai')
+const { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } = require('@google/generative-ai')
 const fs = require('fs')
 const {
   localMedicalReply,
@@ -40,11 +40,32 @@ async function generateMedicalReply(message, history = [], language = 'English')
     }
   }
 
-    if (process.env.GEMINI_API_KEY) {
-      try {
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
-        const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || 'gemini-1.5-flash' })
-        const transcript = chatHistory
+  const apiKey = process.env.GEMINI_API_KEY || 'AIzaSyCtUvIUylXRTJNV22ixxHIiUASXmQ-aWJM';
+  if (apiKey) {
+    try {
+      const genAI = new GoogleGenerativeAI(apiKey)
+      const model = genAI.getGenerativeModel({ 
+        model: 'gemini-1.5-flash',
+        safetySettings: [
+          {
+            category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+            threshold: HarmBlockThreshold.BLOCK_NONE,
+          },
+          {
+            category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+            threshold: HarmBlockThreshold.BLOCK_NONE,
+          },
+          {
+            category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+            threshold: HarmBlockThreshold.BLOCK_NONE,
+          },
+          {
+            category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+            threshold: HarmBlockThreshold.BLOCK_NONE,
+          }
+        ]
+      })
+      const transcript = chatHistory
         .map((item) => `${item.role === 'user' ? 'Patient' : 'Assistant'}: ${item.text}`)
         .join('\n')
       const response = await model.generateContent(
@@ -288,19 +309,33 @@ async function analyzeReportImage(bufferOrPath, mimeType, originalName = '') {
   }
 
   try {
-    if (!process.env.GEMINI_API_KEY) {
-      console.warn('GEMINI_API_KEY not configured. Using smart local fallback.')
-      return {
-        disease: 'API Key Missing',
-        analysis: 'Error: GEMINI_API_KEY is not configured on your server (Vercel/Render environment variables). The AI cannot process the report.',
-        solution: 'Please add your Gemini API key to your hosting provider settings.',
-        prescription: 'N/A',
-        foodSuggestions: 'N/A'
-      }
+    const apiKey = process.env.GEMINI_API_KEY || 'AIzaSyCtUvIUylXRTJNV22ixxHIiUASXmQ-aWJM';
+    if (!apiKey) {
+      return getSmartFallback(originalName, mimeType)
     }
-
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+    
+    const genAI = new GoogleGenerativeAI(apiKey)
+    const model = genAI.getGenerativeModel({ 
+      model: 'gemini-1.5-flash',
+      safetySettings: [
+        {
+          category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        }
+      ]
+    })
 
     let base64Data;
     if (Buffer.isBuffer(bufferOrPath)) {

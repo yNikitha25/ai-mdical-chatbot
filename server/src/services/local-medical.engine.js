@@ -137,10 +137,68 @@ function t(language, en, hi, te) {
   return en
 }
 
+function formatDirectMedicalReply({ message, intent, symptoms, facts, profile }) {
+  const symptomLabel = symptoms.length ? symptoms.join(', ') : 'not specified yet'
+  const factLine = formatFacts(facts, 'English')
+  const factsText = factLine ? ` ${factLine}.` : ''
+  const causes = profile.causes.join(', ')
+  const questions = profile.questions.join(' ')
+
+  if (intent === 'medicine') {
+    return `Your question: "${message}"
+
+Based on what you have shared so far, the noted symptom(s) are: ${symptomLabel}.${factsText}
+
+Common possibilities: ${causes}.
+Medicine guidance: ${profile.meds}
+Self-care: ${profile.care}
+
+Please confirm: ${questions}
+
+Safety note: I can provide general guidance only, not a final diagnosis. Consult a doctor or pharmacist before taking medicine, especially for children, pregnancy, allergies, kidney/liver disease, or other existing conditions.`
+  }
+
+  if (intent === 'diet') {
+    return `Your question: "${message}"
+
+For ${symptomLabel}, a safe diet approach is light meals, warm fluids, fruits if tolerated, and small frequent sips of water or ORS.
+
+Specific care: ${profile.care}
+Avoid alcohol, smoking, very oily or spicy food, and random antibiotics unless a doctor prescribes them.
+
+Seek medical care if symptoms are severe, worsening, or lasting longer than expected.`
+  }
+
+  if (intent === 'duration') {
+    return `Your question: "${message}"
+
+Recovery time depends on the cause. For common mild viral or digestive symptoms, many people improve in 2-5 days with rest and fluids, but symptoms lasting more than 3 days with high fever, worsening pain, breathing trouble, dehydration, or confusion need medical review.
+
+Noted symptom(s): ${symptomLabel}.${factsText}
+Helpful next detail: ${questions}`
+  }
+
+  return `Your question: "${message}"
+
+Initial assessment: I noted ${symptomLabel}.${factsText}
+Common possibilities: ${causes}.
+Self-care now: ${profile.care}
+Medicine guidance: ${profile.meds}
+Watch for worsening symptoms, high fever above 103 F, breathing difficulty, chest pain, fainting, confusion, blood in vomit/stool, or severe dehydration.
+
+To narrow this down, please tell me: ${questions}
+
+Safety note: I am an AI assistant, not a doctor. Use this as general guidance and consult a certified medical professional for diagnosis or treatment.`
+}
+
 function replyForIntent({ message, history, language, intent, symptoms, facts, profileKey }) {
   const profile = PROFILES[profileKey] || PROFILES.general
   const quote = t(language, `Your question: "${message}"`, `आपका सवाल: "${message}"`, `మీ ప్రశ్న: "${message}"`)
   const factLine = formatFacts(facts, language)
+
+  if (['medicine', 'diet', 'duration', 'vitals', 'follow_up', 'symptoms', 'general'].includes(intent)) {
+    return formatDirectMedicalReply({ message, intent, symptoms, facts, profile })
+  }
 
   if (intent === 'greeting') {
     return t(
