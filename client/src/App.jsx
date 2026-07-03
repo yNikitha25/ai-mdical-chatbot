@@ -7,16 +7,19 @@ import {
   AlertTriangle,
   Bell,
   Brain,
-  CalendarClock,
+  Calendar,
   Camera,
   Check,
+  ChevronLeft,
   ChevronRight,
+  ChevronRight as ChevronRightIcon,
   Download,
   Eye,
   FileText,
   Fingerprint,
   HeartPulse,
   Home,
+  Image,
   Languages,
   Lock,
   LogOut,
@@ -39,6 +42,9 @@ import {
   FileWarning,
   ClipboardList,
   PenTool,
+  MessageSquare,
+  ActivitySquare,
+  Trash2
 } from 'lucide-react'
 import {
   Bar,
@@ -1430,36 +1436,97 @@ function AIChat({ setActive, consultation, setConsultation, pendingVoiceInput, s
 }
 
 function Analysis({ consultation, language }) {
-  const detected = consultation.symptoms || []
-  const panelAnalytics = detected.includes('fever')
-    ? analytics
-    : analytics.filter((item) => item.name !== 'Viral Fever')
   return (
-    <div className="analysis-grid">
-      <GlassPanel title={t('AI Analysis Engine', language)} action={detected.length ? 'From your chat' : 'Risk model'}>
-        {detected.length > 0 && <p className="prescription-sync-note">Active symptoms from chat: {detected.join(', ')}</p>}
-        <div className="diagnosis-list">
-          {(detected.length ? panelAnalytics : analytics).map((item) => <ProgressCard key={item.name} item={item} />)}
+    <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px', height: '100%', alignItems: 'start', color: '#1e293b' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <div>
+          <h1 style={{ fontSize: '28px', color: '#0f3c3a', margin: '0 0 8px 0', fontWeight: 'bold' }}>Symptom Checker</h1>
+          <p style={{ color: '#64748b', margin: 0 }}>Describe your symptoms and get an AI-powered assessment.</p>
         </div>
-      </GlassPanel>
-      <GlassPanel title={t('Affected Organs', language)} action="Interactive graph">
-        <ResponsiveContainer width="100%" height={260}>
-          <PieChart>
-            <Pie data={[{ name: 'Respiratory', value: 42 }, { name: 'Neurological', value: 26 }, { name: 'Immune', value: 32 }]} dataKey="value" innerRadius={62} outerRadius={96}>
-              {['#29d3ff', '#8b5cf6', '#ef4444'].map((color) => <Cell key={color} fill={color} />)}
-            </Pie>
-            <Tooltip />
-          </PieChart>
-        </ResponsiveContainer>
-      </GlassPanel>
-      <GlassPanel title={t('Severity Matrix', language)} action="Clinical indicators">
-        <div className="risk-stack">
-          <Risk label="Severity" value="Moderate" percent={64} />
-          <Risk label="Recovery probability" value="87%" percent={87} />
-          <Risk label="Emergency risk" value="Low" percent={22} danger />
-          <Risk label="Organ stress" value="Respiratory" percent={48} />
+        <div style={{ background: '#fff', borderRadius: '16px', padding: '24px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+          <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '18px', margin: '0 0 8px 0', color: '#0f3c3a' }}><Activity size={20}/> Analyze Symptoms</h2>
+          <p style={{ color: '#64748b', fontSize: '14px', margin: '0 0 20px 0' }}>Provide details about what you're experiencing.</p>
+          
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#1e293b', marginBottom: '8px' }}>Describe your symptoms</label>
+            <textarea placeholder="e.g., headache, fever, sore throat" style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '12px', minHeight: '100px', outline: 'none', resize: 'none', background: '#fff', color: '#1e293b' }}></textarea>
+          </div>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#1e293b', marginBottom: '8px' }}>Duration</label>
+              <select style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '10px', outline: 'none', background: '#fff', color: '#1e293b' }}>
+                <option>How long?</option>
+                <option>Less than a day</option>
+                <option>1-3 days</option>
+                <option>More than a week</option>
+              </select>
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#1e293b', marginBottom: '8px' }}>Severity</label>
+              <select style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '10px', outline: 'none', background: '#fff', color: '#1e293b' }}>
+                <option>How bad?</option>
+                <option>Mild</option>
+                <option>Moderate</option>
+                <option>Severe</option>
+              </select>
+            </div>
+          </div>
+          
+          <button style={{ width: '100%', background: '#71c4c1', color: '#fff', padding: '14px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '16px', cursor: 'pointer' }}>Analyze Symptoms</button>
         </div>
-      </GlassPanel>
+        
+        <div style={{ background: '#f0fdfa', borderRadius: '16px', padding: '24px', border: '1px solid #ccfbf1' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h2 style={{ margin: 0, fontSize: '18px', color: '#0f3c3a' }}>Assessment Result</h2>
+            <span style={{ background: '#d1fae5', color: '#065f46', padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px' }}><Check size={14}/> Low</span>
+          </div>
+          <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#64748b', letterSpacing: '1px', marginBottom: '8px' }}>POSSIBLE CONDITIONS</div>
+          <p style={{ color: '#1e293b', margin: 0, fontSize: '14px' }}>No specific condition detected from the provided text.</p>
+        </div>
+      </div>
+      
+      <div style={{ background: '#fff', borderRadius: '16px', padding: '24px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', marginTop: '68px' }}>
+        <h2 style={{ margin: '0 0 8px 0', fontSize: '18px', color: '#0f3c3a' }}>History</h2>
+        <p style={{ color: '#64748b', fontSize: '14px', margin: '0 0 20px 0' }}>Your recent assessments</p>
+        
+        <div style={{ position: 'relative', marginBottom: '16px' }}>
+          <Search size={18} style={{ position: 'absolute', left: '12px', top: '10px', color: '#94a3b8' }} />
+          <input type="text" placeholder="Search symptoms..." style={{ width: '100%', padding: '10px 10px 10px 38px', border: '1px solid #e2e8f0', borderRadius: '8px', outline: 'none', background: '#fff', color: '#1e293b' }} />
+        </div>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px' }}>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '8px 12px', fontSize: '14px', color: '#64748b', background: '#fff' }}>
+            <span>08-06-2026</span>
+            <Calendar size={16} style={{ marginLeft: 'auto' }} />
+          </div>
+          <span style={{ color: '#94a3b8' }}>to</span>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '8px 12px', fontSize: '14px', color: '#64748b', background: '#fff' }}>
+            <span>dd-mm-yyyy</span>
+            <Calendar size={16} style={{ marginLeft: 'auto' }} />
+          </div>
+        </div>
+        
+        {/* Mock Calendar */}
+        <div style={{ border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px', background: '#fff' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', fontWeight: 'bold', fontSize: '14px', color: '#1e293b' }}>
+            <ChevronLeft size={16} /> June, 2026 <ChevronRight size={16} />
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', textAlign: 'center', gap: '8px', fontSize: '12px' }}>
+            <div style={{ color: '#94a3b8' }}>Su</div><div style={{ color: '#94a3b8' }}>Mo</div><div style={{ color: '#94a3b8' }}>Tu</div><div style={{ color: '#94a3b8' }}>We</div><div style={{ color: '#94a3b8' }}>Th</div><div style={{ color: '#94a3b8' }}>Fr</div><div style={{ color: '#94a3b8' }}>Sa</div>
+            <div style={{ color: '#cbd5e1' }}>31</div><div style={{ color: '#1e293b' }}>1</div><div style={{ color: '#1e293b' }}>2</div><div style={{ color: '#1e293b' }}>3</div><div style={{ color: '#1e293b' }}>4</div><div style={{ color: '#1e293b' }}>5</div><div style={{ color: '#1e293b' }}>6</div>
+            <div style={{ color: '#1e293b' }}>7</div><div style={{ background: '#0f3c3a', color: '#fff', borderRadius: '4px', padding: '2px' }}>8</div><div style={{ color: '#1e293b' }}>9</div><div style={{ color: '#1e293b' }}>10</div><div style={{ color: '#1e293b' }}>11</div><div style={{ color: '#1e293b' }}>12</div><div style={{ color: '#1e293b' }}>13</div>
+            <div style={{ color: '#1e293b' }}>14</div><div style={{ color: '#1e293b' }}>15</div><div style={{ color: '#1e293b' }}>16</div><div style={{ color: '#1e293b' }}>17</div><div style={{ color: '#1e293b' }}>18</div><div style={{ color: '#1e293b' }}>19</div><div style={{ color: '#1e293b' }}>20</div>
+            <div style={{ color: '#1e293b' }}>21</div><div style={{ color: '#1e293b' }}>22</div><div style={{ color: '#1e293b' }}>23</div><div style={{ color: '#1e293b' }}>24</div><div style={{ color: '#1e293b' }}>25</div><div style={{ color: '#1e293b' }}>26</div><div style={{ color: '#1e293b' }}>27</div>
+            <div style={{ color: '#1e293b' }}>28</div><div style={{ color: '#1e293b' }}>29</div><div style={{ color: '#1e293b' }}>30</div><div style={{ color: '#cbd5e1' }}>1</div><div style={{ color: '#cbd5e1' }}>2</div><div style={{ color: '#cbd5e1' }}>3</div><div style={{ color: '#cbd5e1' }}>4</div>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '16px', fontSize: '13px', color: '#3b82f6' }}>
+            <span style={{ cursor: 'pointer' }}>Clear</span>
+            <span style={{ cursor: 'pointer' }}>Today</span>
+          </div>
+        </div>
+        
+      </div>
     </div>
   )
 }
@@ -1801,12 +1868,11 @@ function EmergencyAlerts({ language }) {
 
 function Reports({ consultation, setConsultation, setActive, language, reports, fetchReports }) {
   const [isUploading, setIsUploading] = useState(false)
+  const [selectedReport, setSelectedReport] = useState(reports[0] || null)
 
   const handleUpload = async (e) => {
     if (!e.target.files.length) return
-    
-    // Check file sizes (Vercel has a 4.5MB limit, let's limit to 4MB)
-    const MAX_SIZE = 4 * 1024 * 1024; // 4MB
+    const MAX_SIZE = 4 * 1024 * 1024;
     for (let i = 0; i < e.target.files.length; i++) {
       if (e.target.files[i].size > MAX_SIZE) {
         alert(`The file "${e.target.files[i].name}" is too large! Please upload an image smaller than 4MB.`);
@@ -1839,52 +1905,9 @@ function Reports({ consultation, setConsultation, setActive, language, reports, 
         const data = await res.json()
         if (data.reports && data.reports.length > 0) {
           const report = data.reports[0]
-          
-          // Parse report prescription string into structured list
-          const medicines = []
-          if (report.prescription) {
-            const lines = report.prescription.split(/,|\n/)
-            lines.forEach((line) => {
-              const cleanLine = line.replace(/^\d+\.\s*/, '').trim()
-              if (!cleanLine) return
-              const parts = cleanLine.split(/-|–/)
-              if (parts.length >= 3) {
-                medicines.push({
-                  name: parts[0].trim(),
-                  dosage: parts[1].trim(),
-                  timing: parts[2].trim(),
-                })
-              } else if (parts.length === 2) {
-                medicines.push({
-                  name: parts[0].trim(),
-                  dosage: parts[1].trim(),
-                  timing: 'As directed by doctor',
-                })
-              } else {
-                medicines.push({
-                  name: cleanLine,
-                  dosage: 'As prescribed',
-                  timing: 'As directed by doctor',
-                })
-              }
-            })
-          }
-          
-          // Update consultation prescription dynamically
-          setConsultation(prev => ({
-            ...prev,
-            prescription: {
-              disclaimer: 'Generated from Medical Report Triage. Consult a doctor.',
-              medicines: medicines.length ? medicines : (prev?.prescription?.medicines || []),
-            },
-            symptoms: (report?.originalName?.toLowerCase()?.includes('skin') || report?.originalName?.toLowerCase()?.includes('rash'))
-              ? ['allergy'] 
-              : (prev?.symptoms || [])
-          }))
           setReports(prev => [report, ...prev])
+          setSelectedReport(report)
         }
-        // DB is bypassed, so don't fetch empty array from backend
-        // await fetchReports()
       }
     } catch (err) {
       console.error(err)
@@ -1894,62 +1917,144 @@ function Reports({ consultation, setConsultation, setActive, language, reports, 
     }
   }
 
+  // Helper to split results string into pill tags
+  const getPills = (resultsStr) => {
+    if (!resultsStr) return []
+    return resultsStr.split('\n').map(r => r.replace(/^[•\-\*]\s*/, '').trim()).filter(Boolean)
+  }
+
   return (
-    <div className="reports-wrapper">
-      <div className="reports-grid">
-        <GlassPanel title={t('Medical Report Upload System', language)} action={isUploading ? "Analyzing..." : "OCR + AI summary"}>
-          <label className="upload-zone" style={{ opacity: isUploading ? 0.5 : 1 }}>
-            <Upload size={42} />
-            <span>{isUploading ? "Uploading & Analyzing using AI... This may take a few seconds." : "Upload reports, prescriptions, scans, or images"}</span>
-            <input type="file" multiple onChange={handleUpload} disabled={isUploading} />
-          </label>
-        </GlassPanel>
-        
-        {reports.length === 0 && (
-          <GlassPanel title={t('AI Report Summary', language)} action="Demo extraction">
-            <p className="report-copy">No reports uploaded yet. Upload a scan image to run the visual triage workflow.</p>
-          </GlassPanel>
-        )}
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '24px', color: '#1e293b' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h1 style={{ fontSize: '28px', color: '#0f3c3a', margin: '0 0 8px 0', fontWeight: 'bold' }}>Medical Reports</h1>
+          <p style={{ color: '#64748b', margin: 0 }}>Upload and analyze your medical reports with AI.</p>
+        </div>
+        <label style={{ background: '#2dd4bf', color: '#fff', padding: '12px 24px', borderRadius: '8px', cursor: isUploading ? 'not-allowed' : 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Upload size={18}/> {isUploading ? "Uploading..." : "+ Add Report"}
+          <input type="file" style={{ display: 'none' }} multiple onChange={handleUpload} disabled={isUploading} />
+        </label>
       </div>
 
-      {reports.map((report) => (
-        <div key={report._id} className="report-analysis-card" style={{ marginTop: '20px', display: 'flex', gap: '20px', background: 'rgba(10, 20, 35, 0.7)', padding: '20px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', flexWrap: 'wrap' }}>
-          <div style={{ flex: '1 1 300px', minWidth: '250px' }}>
-             <img src={report.cloudinaryUrl || `${API_URL.replace('/api', '')}/uploads/${report.filename}`} alt="Report" style={{ width: '100%', borderRadius: '8px', objectFit: 'contain', maxHeight: '400px', backgroundColor: 'rgba(255,255,255,0.05)' }} />
-             <div style={{ marginTop: '10px', fontSize: '0.9em', color: '#8aa3b8' }}>{report.originalName}</div>
-             <div style={{ marginTop: '5px', fontSize: '0.8em', color: '#8aa3b8' }}>Date: {new Date(report.createdAt).toLocaleDateString()}</div>
+      <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+        <div style={{ position: 'relative', flex: 1, maxWidth: '400px' }}>
+          <Search size={18} style={{ position: 'absolute', left: '12px', top: '10px', color: '#94a3b8' }} />
+          <input type="text" placeholder="Search reports..." style={{ width: '100%', padding: '10px 10px 10px 38px', border: '1px solid #e2e8f0', borderRadius: '8px', outline: 'none', background: '#fff', color: '#1e293b' }} />
+        </div>
+        <div style={{ color: '#64748b', fontSize: '14px', marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span>Date:</span>
+          <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '8px 12px', background: '#fff' }}>
+            <span>dd-mm-yyyy</span> <Calendar size={14} style={{ marginLeft: '8px' }}/>
           </div>
-          <div style={{ flex: '2 1 500px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
-             <div style={{ background: 'rgba(41, 211, 255, 0.05)', padding: '15px', borderRadius: '12px', border: '1px solid rgba(41, 211, 255, 0.1)' }}>
-                <h4 style={{ color: '#10b981', margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: '8px' }}><Activity size={18} /> Detected Condition</h4>
-                <div style={{ fontSize: '1.2em', fontWeight: 'bold', color: '#1e293b', marginBottom: '8px' }}>
-                  {report.predictions && report.predictions.length > 0 ? report.predictions[0].disease : 'Unknown Condition'}
-                </div>
-                <h4 style={{ color: '#10b981', margin: '12px 0 8px 0', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9em' }}>Detailed Analysis</h4>
-                <p style={{ margin: 0, fontSize: '0.95em', lineHeight: '1.6', color: '#e2e8f0' }}>{report.analysis || report.summary || 'Pending AI Summary'}</p>
-                
-                {report.results && (
-                  <>
-                    <h4 style={{ color: '#0ea5e9', margin: '12px 0 8px 0', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9em' }}><ClipboardList size={16} /> Key Results & Findings</h4>
-                    <p style={{ margin: 0, fontSize: '0.95em', lineHeight: '1.6', color: '#e2e8f0', whiteSpace: 'pre-wrap' }}>{report.results}</p>
-                  </>
-                )}
-             </div>
-             <div style={{ background: 'rgba(244, 114, 182, 0.05)', padding: '15px', borderRadius: '12px', border: '1px solid rgba(244, 114, 182, 0.1)' }}>
-                <h4 style={{ color: '#f472b6', margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: '8px' }}><Stethoscope size={18} /> Recommended Solution</h4>
-                <p style={{ margin: 0, fontSize: '0.95em', lineHeight: '1.6', color: '#e2e8f0' }}>{report.solution || 'Consult your doctor for a detailed plan.'}</p>
-             </div>
-             <div style={{ background: 'rgba(167, 139, 250, 0.05)', padding: '15px', borderRadius: '12px', border: '1px solid rgba(167, 139, 250, 0.1)' }}>
-                <h4 style={{ color: '#a78bfa', margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: '8px' }}><Pill size={18} /> Prescription Suggestions</h4>
-                <p style={{ margin: 0, fontSize: '0.95em', lineHeight: '1.6', color: '#e2e8f0' }}>{report.prescription || 'N/A'}</p>
-             </div>
-             <div style={{ background: 'rgba(52, 211, 153, 0.05)', padding: '15px', borderRadius: '12px', border: '1px solid rgba(52, 211, 153, 0.1)' }}>
-                <h4 style={{ color: '#34d399', margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: '8px' }}><Utensils size={18} /> Food & Diet Advice</h4>
-                <p style={{ margin: 0, fontSize: '0.95em', lineHeight: '1.6', color: '#e2e8f0' }}>{report.foodSuggestions || 'Maintain a balanced diet.'}</p>
-             </div>
+          <span>to</span>
+          <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '8px 12px', background: '#fff' }}>
+            <span>dd-mm-yyyy</span> <Calendar size={14} style={{ marginLeft: '8px' }}/>
           </div>
         </div>
-      ))}
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '400px 1fr', gap: '24px', flex: 1, alignItems: 'start' }}>
+        
+        {/* Left List */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxHeight: 'calc(100vh - 250px)', overflowY: 'auto', paddingRight: '8px' }}>
+          {reports.length === 0 && <div style={{ color: '#64748b', padding: '20px', textAlign: 'center', background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0' }}>No reports uploaded yet.</div>}
+          
+          {reports.map((report) => {
+            const isSelected = selectedReport?._id === report._id
+            let tagColor = '#94a3b8'
+            let tagBg = '#f1f5f9'
+            const titleLow = (report.originalName || '').toLowerCase()
+            let tagName = 'General'
+            if (titleLow.includes('blood') || titleLow.includes('cbc')) { tagColor = '#ef4444'; tagBg = '#fee2e2'; tagName = 'Blood Test' }
+            else if (titleLow.includes('ct')) { tagColor = '#8b5cf6'; tagBg = '#ede9fe'; tagName = 'CT Scan' }
+            else if (titleLow.includes('ecg') || titleLow.includes('heart')) { tagColor = '#f43f5e'; tagBg = '#ffe4e6'; tagName = 'ECG' }
+            
+            return (
+              <div 
+                key={report._id} 
+                onClick={() => setSelectedReport(report)}
+                style={{ background: '#fff', borderRadius: '12px', padding: '16px', border: `2px solid ${isSelected ? '#2dd4bf' : '#e2e8f0'}`, cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: '12px', position: 'relative' }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <div style={{ fontWeight: '600', color: '#0f3c3a', maxWidth: '250px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {report.originalName || 'Medical Report'}
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px', color: '#94a3b8' }}>
+                    <Eye size={16} />
+                    <Trash2 size={16} color="#ef4444" />
+                  </div>
+                </div>
+                <div style={{ fontSize: '13px', color: '#94a3b8' }}>{new Date(report.createdAt).toLocaleDateString()}</div>
+                <div>
+                  <span style={{ color: tagColor, background: tagBg, padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: '500' }}>{tagName}</span>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Right Details */}
+        {selectedReport ? (
+          <div style={{ background: '#fff', borderRadius: '16px', padding: '24px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '24px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <h2 style={{ margin: '0 0 4px 0', fontSize: '20px', color: '#0f3c3a' }}>{selectedReport.originalName || 'Medical Report'}</h2>
+                <div style={{ color: '#64748b', fontSize: '14px' }}>{new Date(selectedReport.createdAt).toLocaleDateString()}</div>
+              </div>
+              <span style={{ color: '#ef4444', background: '#fee2e2', padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: '500' }}>Analysis Complete</span>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+              {/* Image box */}
+              <div style={{ background: '#f8fafc', border: '1px dashed #cbd5e1', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '300px', overflow: 'hidden' }}>
+                <div style={{ color: '#64748b', fontSize: '12px', fontWeight: 'bold', letterSpacing: '1px', marginBottom: '12px' }}><Image size={16} style={{display:'inline', verticalAlign:'middle'}}/> UPLOADED REPORT</div>
+                {selectedReport.cloudinaryUrl || selectedReport.filename ? (
+                   <img src={selectedReport.cloudinaryUrl || `${API_URL.replace('/api', '')}/uploads/${selectedReport.filename}`} alt="Report" style={{ maxWidth: '100%', maxHeight: '250px', objectFit: 'contain', borderRadius: '8px' }} />
+                ) : (
+                   <div style={{ color: '#94a3b8', fontSize: '14px' }}>No image uploaded for this report.</div>
+                )}
+              </div>
+
+              {/* Analysis Text */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                <div>
+                  <div style={{ color: '#64748b', fontSize: '12px', fontWeight: 'bold', letterSpacing: '1px', marginBottom: '8px' }}>ORIGINAL CONTENT</div>
+                  <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', fontSize: '13px', color: '#64748b', lineHeight: '1.6' }}>
+                    {selectedReport.ocrText || 'AI analysis complete. No raw text available.'}
+                  </div>
+                </div>
+
+                <div>
+                  <div style={{ color: '#64748b', fontSize: '12px', fontWeight: 'bold', letterSpacing: '1px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}><Activity size={14}/> WHAT MAY BE HAPPENING</div>
+                  <div style={{ fontSize: '14px', color: '#1e293b', lineHeight: '1.6', background: '#f0fdfa', padding: '16px', borderRadius: '12px', border: '1px solid #ccfbf1' }}>
+                    <b>Supportive report summary:</b> {selectedReport.analysis || selectedReport.summary}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Key Findings Pills */}
+            <div>
+              <div style={{ color: '#64748b', fontSize: '12px', fontWeight: 'bold', letterSpacing: '1px', marginBottom: '12px' }}>KEY FINDINGS</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                {getPills(selectedReport.results).length > 0 ? getPills(selectedReport.results).map((pill, i) => (
+                  <span key={i} style={{ background: '#f1f5f9', color: '#334155', border: '1px solid #e2e8f0', padding: '6px 14px', borderRadius: '20px', fontSize: '13px', fontWeight: '500' }}>
+                    {pill}
+                  </span>
+                )) : (
+                  <span style={{ color: '#94a3b8', fontSize: '14px' }}>No specific findings extracted.</span>
+                )}
+              </div>
+            </div>
+
+          </div>
+        ) : (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8fafc', borderRadius: '16px', border: '1px dashed #e2e8f0', color: '#94a3b8' }}>
+            Select a report to view details
+          </div>
+        )}
+      </div>
     </div>
   )
 }
