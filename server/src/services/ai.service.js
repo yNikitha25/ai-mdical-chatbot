@@ -1,6 +1,5 @@
 const OpenAI = require('openai')
 const fs = require('fs')
-const fs = require('fs')
 const {
   localMedicalReply,
   extractSymptoms,
