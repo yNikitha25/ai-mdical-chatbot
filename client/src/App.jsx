@@ -396,14 +396,19 @@ function buildClientAnalysis(text) {
 function buildClientPrescription(text) {
   const analysis = buildClientAnalysis(text)
   if (!analysis.symptoms.length) return { ...defaultPrescription, symptoms: [] }
-  const medicines = [
-    {
+  const medicines = []
+  if (analysis.symptoms.includes('headache') || analysis.symptoms.includes('fever') || analysis.symptoms.includes('fatigue')) {
+    medicines.push({
       name: 'Paracetamol (Acetaminophen)',
       dosage: '500 mg',
       timing: 'Every 6-8 hours after food for fever, headache, or body pain (max 4 doses in 24 hours)',
-    },
-    { name: 'ORS / electrolyte solution', dosage: '200-250 ml', timing: 'Every 3-4 hours while fever continues' },
-  ]
+    })
+  }
+  
+  if (analysis.symptoms.includes('fever') || analysis.symptoms.includes('stomach pain')) {
+    medicines.push({ name: 'ORS / electrolyte solution', dosage: '200-250 ml', timing: 'Every 3-4 hours to prevent dehydration' })
+  }
+  
   if (analysis.symptoms.includes('fever')) {
     medicines.push({ name: 'Vitamin C (optional)', dosage: '500 mg', timing: 'Once daily after food during recovery' })
   }
