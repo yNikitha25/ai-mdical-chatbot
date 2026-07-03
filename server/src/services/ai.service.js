@@ -1,5 +1,5 @@
 const OpenAI = require('openai')
-const { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } = require('@google/generative-ai')
+const fs = require('fs')
 const fs = require('fs')
 const {
   localMedicalReply,
@@ -40,41 +40,39 @@ async function generateMedicalReply(message, history = [], language = 'English')
     }
   }
 
-  const apiKey = process.env.GEMINI_API_KEY || 'AIzaSyCtUvIUylXRTJNV22ixxHIiUASXmQ-aWJM';
-  if (apiKey) {
-    try {
-      const genAI = new GoogleGenerativeAI(apiKey)
-      const model = genAI.getGenerativeModel({ 
-        model: 'gemini-1.5-flash',
-        safetySettings: [
-          {
-            category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-            threshold: HarmBlockThreshold.BLOCK_NONE,
-          },
-          {
-            category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-            threshold: HarmBlockThreshold.BLOCK_NONE,
-          },
-          {
-            category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-            threshold: HarmBlockThreshold.BLOCK_NONE,
-          },
-          {
-            category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-            threshold: HarmBlockThreshold.BLOCK_NONE,
-          }
-        ]
+  // Fallback to HuggingFace free inference API
+  try {
+    const hfToken = process.env.HF_API_KEY || ''; // Optional: works better with a token
+    const headers = { 'Content-Type': 'application/json' };
+    if (hfToken) headers['Authorization'] = `Bearer ${hfToken}`;
+    
+    // Dynamic import for fetch since Node < 18 might not have it, but Vercel Node 18+ does
+    const fetch = global.fetch || require('node-fetch');
+
+    const transcript = chatHistory
+      .map((item) => `${item.role === 'user' ? 'Patient' : 'Assistant'}: ${item.text}`)
+      .join('\n')
+    const prompt = `${systemPrompt}\n${languageInstruction}\n\nConversation:\n${transcript}\nPatient (latest): ${message}\n\nAssistant:`
+
+    const response = await fetch('https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        inputs: prompt,
+        parameters: { max_new_tokens: 250, temperature: 0.7, return_full_text: false }
       })
-      const transcript = chatHistory
-        .map((item) => `${item.role === 'user' ? 'Patient' : 'Assistant'}: ${item.text}`)
-        .join('\n')
-      const response = await model.generateContent(
-        `${systemPrompt}\n${languageInstruction}\n\nConversation:\n${transcript}\nPatient (latest): ${message}\n\nReply to the latest patient message only.`,
-      )
-      return response.response.text()
-    } catch (err) {
-      console.warn("Gemini chat API failed, falling back to local...", err)
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      if (data && data.length > 0 && data[0].generated_text) {
+        return data[0].generated_text.trim();
+      }
+    } else {
+      console.warn("HuggingFace API failed with status:", response.status);
     }
+  } catch (err) {
+    console.warn("HuggingFace chat API failed, falling back to local...", err.message)
   }
 
   return localMedicalReply(message, chatHistory, language)
@@ -308,97 +306,9 @@ async function analyzeReportImage(bufferOrPath, mimeType, originalName = '') {
     }
   }
 
-  try {
-    const apiKey = process.env.GEMINI_API_KEY || 'AIzaSyCtUvIUylXRTJNV22ixxHIiUASXmQ-aWJM';
-    if (!apiKey) {
-      return getSmartFallback(originalName, mimeType)
-    }
-    
-    const genAI = new GoogleGenerativeAI(apiKey)
-    const model = genAI.getGenerativeModel({ 
-      model: 'gemini-1.5-flash',
-      safetySettings: [
-        {
-          category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-          threshold: HarmBlockThreshold.BLOCK_NONE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-          threshold: HarmBlockThreshold.BLOCK_NONE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-          threshold: HarmBlockThreshold.BLOCK_NONE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-          threshold: HarmBlockThreshold.BLOCK_NONE,
-        }
-      ]
-    })
-
-    let base64Data;
-    if (Buffer.isBuffer(bufferOrPath)) {
-      base64Data = bufferOrPath.toString('base64');
-    } else {
-      base64Data = fs.readFileSync(bufferOrPath).toString('base64');
-    }
-
-    const fileData = {
-      inlineData: {
-        data: base64Data,
-        mimeType: mimeType,
-      },
-    }
-
-const prompt = `You are an expert medical AI assistant. Analyze the provided test report or medical image.
-Please extract and infer the following details. Respond ONLY with a valid JSON object using this structure:
-{
-  "analysis": "A detailed explanation of what happened or the results found in the report.",
-  "results": "Key values, measurements, or direct medical findings from the report in bullet points.",
-  "solution": "Recommended immediate solution or action plan.",
-  "prescription": "Suggested prescription or medicines (with a disclaimer to consult a doctor).",
-  "foodSuggestions": "Specific diet or food to be taken for recovery.",
-  "disease": "The primary disease, condition, or diagnosis detected (e.g., 'Type 2 Diabetes', 'Healthy'). Keep it to 1-4 words."
-}`
-
-    const result = await model.generateContent([prompt, fileData])
-    const responseText = result.response.text()
-    
-    // Extract JSON using regex matching the first { to the last }
-        // Clean up potential markdown formatting from Gemini response
-    const cleanResponse = responseText.replace(/\s*```json\s*/g, '').replace(/\s*```\s*/g, '');
-    const jsonMatch = cleanResponse.match(/\{[\s\S]*\}/)
-    if (!jsonMatch) {
-      console.warn("Could not parse JSON from Gemini response, raw text was: ", responseText);
-      throw new Error('No valid JSON object found in Gemini response')
-    }
-    const parsed = JSON.parse(jsonMatch[0].trim())
-
-    return {
-      analysis: parsed.analysis || 'Analysis not available.',
-      results: parsed.results || 'No specific findings extracted.',
-      solution: parsed.solution || 'No solution recommended.',
-      prescription: parsed.prescription || 'No specific prescription.',
-      foodSuggestions: parsed.foodSuggestions || 'Regular diet.',
-      disease: parsed.disease || 'Unknown Condition',
-    }
-  } catch (error) {
-    console.error('Error analyzing image via Gemini API, using smart local fallback:', error)
-    
-    // Check if it's a known medical file based on name, otherwise return the actual error so the user knows what went wrong!
-    const fallback = getSmartFallback();
-    if (fallback.disease === 'Healthy / Normal') {
-       return {
-         disease: 'AI Processing Error',
-         analysis: 'The AI failed to analyze this report. Error details: ' + (error.message || String(error)) + '. Please ensure your GEMINI_API_KEY is valid and the file is a supported image/pdf.',
-         solution: 'Try uploading a clearer image or check your API configuration.',
-         prescription: 'N/A',
-         foodSuggestions: 'N/A'
-       };
-    }
-    return fallback;
-  }
+  // HuggingFace free tier does not support reliable multimodal JSON extraction for medical images.
+  // Falling back to the offline mock engine.
+  return getSmartFallback(originalName, mimeType)
 }
 
 module.exports = {
