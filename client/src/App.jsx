@@ -907,6 +907,7 @@ function App() {
                 setActive={setActive} 
                 language={language}
                 reports={reports}
+                setReports={setReports}
                 fetchReports={fetchReports}
               />
             )}
@@ -1888,7 +1889,7 @@ function EmergencyAlerts({ language }) {
   )
 }
 
-function Reports({ consultation, setConsultation, setActive, language, reports, fetchReports }) {
+function Reports({ consultation, setConsultation, setActive, language, reports, setReports, fetchReports }) {
   const [isUploading, setIsUploading] = useState(false)
   const [selectedReport, setSelectedReport] = useState(reports[0] || null)
 
