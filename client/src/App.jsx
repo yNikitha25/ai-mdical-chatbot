@@ -1874,11 +1874,11 @@ function Reports({ consultation, setConsultation, setActive, language, reports, 
             ...prev,
             prescription: {
               disclaimer: 'Generated from Medical Report Triage. Consult a doctor.',
-              medicines: medicines.length ? medicines : prev.prescription.medicines,
+              medicines: medicines.length ? medicines : (prev?.prescription?.medicines || []),
             },
-            symptoms: report.originalName.toLowerCase().includes('skin') || report.originalName.toLowerCase().includes('rash') 
+            symptoms: (report?.originalName?.toLowerCase()?.includes('skin') || report?.originalName?.toLowerCase()?.includes('rash'))
               ? ['allergy'] 
-              : prev.symptoms
+              : (prev?.symptoms || [])
           }))
         }
         await fetchReports()
